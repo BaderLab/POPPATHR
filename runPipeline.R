@@ -1,9 +1,9 @@
 #!/usr/bin/env rscript
 
 #-------------------------------------------------------------------------------
-# PopPaths: Identify pathways enriched for population-driven positive selection
+# POPPATHR: Population-based pathway analysis of SNP-SNP coevolution
 # Special thanks to Shraddha Pai
-# Last modified 7 August 2019
+# Last modified 8 August 2019
 
 #-------------------------------------------------------------------------------
 ## PREPARE PIPELINE ##
