@@ -75,7 +75,7 @@ unenrichNES <- 0.1 # abs NES threshold to define unenriched pathways
 #-------------------------------------------------------------------------------
 ## WORK BEGINS ##
 dt <- format(Sys.Date(), "20%y%m%d")
-outDir <- sprintf("%s/%s_out", dataDir, dt)
+outDir <- sprintf("%s/%s_out_%s_%s", dataDir, dt, pop1, pop2)
 if (!file.exists(outDir)) dir.create(outDir)
 
 sink(sprintf("%s/runPipeline.log", outDir))

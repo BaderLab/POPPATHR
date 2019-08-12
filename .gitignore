@@ -1,4 +1,5 @@
 anno/
 software/
 genotypes/
-*_out/
+*_out_*/
+*.DS_Store
