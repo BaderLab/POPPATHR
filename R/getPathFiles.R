@@ -1,4 +1,5 @@
-#' Generates SNP lists per high-confidence pathway as determined by GSEA
+#' Generates SNP lists per selection-enriched and unenriched pathway
+#' as determined by GSEA
 #'
 #' @param genoF (char) path to file with SNP genotype data (PLINK format).
 #' @param resF (char) path to files with GSEA results.

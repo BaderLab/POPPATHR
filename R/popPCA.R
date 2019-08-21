@@ -3,13 +3,15 @@
 #'
 #' @param genoF (char) path to file with SNP genotype data (PLINK format).
 #' @param famF (char) path to PLINK fam file (case/control population coded).
+#' @param pop1 (char) character code for the first population (controls).
+#' @param pop2 (char) character code for the second population (cases).
 #' @param dimensions (integer, default=3).
 #' @param outF (char) path to write PNG image.
 #'
 #' @return none
 #' @export
 #'
-popPCA <- function(genoF, famF, dimensions=3L, outF) {
+popPCA <- function(genoF, famF, pop1, pop2, dimensions=3L, outF) {
   # Calculate PCA via PLINK
   str1 <- sprintf("PLINK --bed %s.bed --bim %s.bim --fam %s", genoF, genoF, famF)
   str2 <- sprintf("--cluster --mds-plot %i --allow-no-sex --out %s", dimensions, outF)
