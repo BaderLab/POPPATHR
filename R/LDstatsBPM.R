@@ -10,7 +10,7 @@
 #' @return none
 #' @export
 #'
-LDstats <- function(hcInDir, lcInDir, snp2geneF, outDir) {
+LDstatsBPM <- function(hcInDir, lcInDir, snp2geneF, outDir) {
 
 # Read in snp2gene.txt file to assign SNPs to genes
 snp2gene <- read.table(snp2geneF, h=F, as.is=T)

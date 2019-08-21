@@ -16,7 +16,7 @@
 #' @return none
 #' @export
 #'
-LDstats <- function(hcInDir, lcInDir, statistic="R.squared",
+LDstatsWPM <- function(hcInDir, lcInDir, statistic="R.squared",
                     popNames=NULL, outDir) {
 
   # Calculate linkage disequilbrium statistics
