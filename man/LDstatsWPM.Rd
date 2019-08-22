@@ -3,8 +3,7 @@
 \name{LDstatsWPM}
 \alias{LDstatsWPM}
 \title{Calculate selection statistics (LD) and perform exploratory analyses
-for two sets of variants via R snpStats package
-https://bioconductor.org/packages/release/bioc/manuals/snpStats/man/snpStats.pdf}
+for two sets of variants via R snpStats package}
 \usage{
 LDstatsWPM(hcInDir, lcInDir, statistic = "R.squared", popNames = NULL,
   outDir)
@@ -31,5 +30,4 @@ none
 \description{
 Calculate selection statistics (LD) and perform exploratory analyses
 for two sets of variants via R snpStats package
-https://bioconductor.org/packages/release/bioc/manuals/snpStats/man/snpStats.pdf
 }

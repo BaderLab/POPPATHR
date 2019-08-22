@@ -1,7 +1,6 @@
 #' Calculate selection statistics (LD) and perform exploratory analyses
 #' for two sets of variants via R snpStats package
-#' https://bioconductor.org/packages/release/bioc/manuals/snpStats/man/snpStats.pdf
-
+#'
 #' @param hcInDir (char) path to files with high-confidence pathway SNP lists
 #' @param lcInDir (char) path to files with low-confidence pathway SNP lists
 #' @param statistic (char) function will generate both R squared and D prime
