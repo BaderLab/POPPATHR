@@ -7,6 +7,7 @@
 #' 		i.e., CEU vs. YRI and CEU vs. LWK.
 #' @param gseaStatF (char) path to GSEA statistics file.
 #' @param snp2geneF (char) path to SNP-gene mapping file.
+#' @param realFam (char) path to PLINK population coded fam file.
 #' @param enrichNES (integer) NES cutoff to select validated selection-enriched
 #'		pathways (default=0.3)
 #' @param unenrichNES (integer) NES cutoff to select unenriched pathways
@@ -19,48 +20,44 @@
 #' @return none
 #' @export
 #'
-getPathStats <- function(genoF, resF, gseaStatF, snp2geneF,
+getPathStats <- function(genoF, resF, gseaStatF, snp2geneF, realFam,
 												 enrichNES=0.3, unenrichNES=0.1,
 											   enrichDir, unenrichDir) {
 	# Merge GSEA results from both datasets and change column names
 	# so the results from each dataset can be identified after merging
 	pathRes <- lapply(resF, read.delim)
-	for (i in 1:length(pathRes)) {
+	for (i in seq_along(pathRes)) {
 		colnames(pathRes[[i]])[2:7] <- paste(colnames(pathRes[[i]][, c(2:7)]),
-																				 sprintf("res%i", i), sep="_") }
+																				 sprintf("res%i", i), sep="_")
+	}
 
-	res_merge <- merge(pathRes[[1]], pathRes[[2]], by="Geneset")
+	res_merge <- join(pathRes[[1]], pathRes[[2]], by="Geneset")
 
-	# Get the high confidence and low confidence pathways from GSEA results
 	pathStats <- function(pathSet, NEScut, outDir) {
-
+		# Get selection-enriched and unenriched pathways from GSEA results
 		if (pathSet == "enrich") {
-			cat(sprintf("*Determining %s pathways from GSEA results...\n", pathSet))
-			cat(sprintf("\tSelection-enriched NES threshold: %g\n", NEScut))
-
+			cat(sprintf("*Determining %sed pathways from GSEA results...\n", pathSet))
+			cat(sprintf("  Selection-enriched NES threshold: %g\n", NEScut))
 			paths <- filter(res_merge,
-											NES_res1 <= NEScut & NES_res2 <= NEScut)
-			write.table(paths, file=sprintf("%s/results_%s.txt", outDir, pathSet),
-								  col=T, row=F, quote=F, sep="\t")
+											NES_res1 >= NEScut & NES_res2 >= NEScut)
 		} else if (pathSet == "unenrich") {
-			cat(sprintf("*Determining %s pathways from GSEA results...\n", pathSet))
+			cat(sprintf("*Determining %sed pathways from GSEA results...\n", pathSet))
 			cat(sprintf("\tUnenriched NES threshold: %g\n", NEScut))
-
 			paths <- filter(res_merge,
 											NES_res1 <= NEScut & NES_res1 >= -NEScut &
 											NES_res2 <= NEScut & NES_res2 >= -NEScut)
-			write.table(paths, file=sprintf("%s/results_%s.txt", outDir, pathSet),
-								  col=T, row=F, quote=F, sep="\t")
 		}
+		write.table(paths, file=sprintf("%s/results_%s.txt", outDir, pathSet),
+								col=TRUE, row=FALSE, quote=FALSE, sep="\t")
 
-		cat(sprintf("\n*Pulling stats for %i %s pathways...\n", nrow(paths), pathSet))
+		cat(sprintf("\n*Pulling stats for %i %sed pathways...\n", nrow(paths), pathSet))
 
 		# Print list of pathway names, subset GSEA stat file with those
 		# pathway names and read back into R
 		path_names <- paths[,1]
 		write.table(path_names,
 								file=sprintf("%s/pathways_%s.txt", outDir, pathSet),
-								col=F, row=F, quote=F)
+								col=FALSE, row=FALSE, quote=FALSE)
 
 		pathsF <- sprintf("%s/pathways_%s.txt", outDir, pathSet)
 
@@ -77,7 +74,6 @@ getPathStats <- function(genoF, resF, gseaStatF, snp2geneF,
 		snp_stats <- t(stats) #transpose data
 
 		for (i in 1:ncol(snp_stats)) {
-
 			# Remove pathway names
 			path <- snp_stats[-1,i]
 			# Split original df into 3 columns by comma delimiter
@@ -91,7 +87,7 @@ getPathStats <- function(genoF, resF, gseaStatF, snp2geneF,
 			gene_list <- as.data.frame(path[,1])
 
 			# Replace spaces with underscore in pathway name strings
-			names <- gsub(" ", "_", snp_stats[1,i], fixed=T)
+			names <- gsub(" ", "_", snp_stats[1,i], fixed=TRUE)
 			# Replace all special chars with underscore for PLINK compatibility
 			names <- gsub('([[:punct:]])|\\s+', '_', names)
 
@@ -102,7 +98,7 @@ getPathStats <- function(genoF, resF, gseaStatF, snp2geneF,
 
 			gene_file <- file.path(sprintf("%s/%s.genes", outDir, names))
 			cat(sprintf("*Generating list for genes in %s pathway...", names))
-			write.table(gene_list, file=gene_file, col=F, row=F, quote=F)
+			write.table(gene_list, file=gene_file, col=FALSE, row=FALSE, quote=FALSE)
 			cat(" done.\n")
 
 			# Subset original PLINK file with each pathway SNP file and write out
@@ -121,15 +117,17 @@ getPathStats <- function(genoF, resF, gseaStatF, snp2geneF,
 		cat(sprintf(" file written to %s/snps_%s.txt.\n", outDir, pathSet))
 
 		cat("*Writing file with only unique SNPs...")
-		snps <- read.table(sprintf("%s/snps_%s.txt", outDir, pathSet), h=F, as.is=T)
+		snps <- read.table(sprintf("%s/snps_%s.txt", outDir, pathSet), h=FALSE, as.is=TRUE)
 		snps_unique <- as.data.frame(unique(snps))
 		write.table(snps_unique,
 								file=sprintf("%s/snps_unique_%s.txt", outDir, pathSet),
-								col=F, row=F, quote=F)
+								col=FALSE, row=FALSE, quote=FALSE)
 		cat(sprintf(" file written to %s/snps_unique_%s.txt.\n", outDir, pathSet))
 	}
-
  # Run function for enriched and unenriched pathways
- pathStats(pathSet="enrich", NEScut=enrichNES, outDir=enrichDir)
- pathStats(pathSet="unenrich", NEScut=unenrichNES, outDir=unenrichDir)
+ set_list <- c("enrich", "unenrich")
+ nes_list <- c(enrichNES, unenrichNES)
+ dir_list <- c(enrichDir, unenrichDir)
+
+ mapply(pathStats, set_list, nes_list, dir_list)
 }

@@ -1,7 +1,7 @@
 #' Calculates SNP-level FST values for use in setupGSEArun.R
 #'
 #' @param genoF (char) path to file with SNP genotype data (PLINK format).
-#' @param realFam (char) path to PLINK case/control coded fam file.
+#' @param realFam (char) path to PLINK population coded fam file.
 #' @param outDir (char) directory to store output files.
 #' @param outF (char) path to write SNP-FST file.
 #'

@@ -8,7 +8,6 @@ Imports:
   dplyr,
   ggplot2,
   data.table,
-  tools,
   stringr,
   reshape2,
   gdata,

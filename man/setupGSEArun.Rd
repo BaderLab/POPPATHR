@@ -15,7 +15,7 @@ setupGSEArun(realF, pathF, snp2geneF, setPerm = 1000L,
 \item{pathF}{(char) path to pathway definitions GMT file}
 
 \item{snp2geneF}{(char) path to file with snp2gene mappings. Output of
-mapSNP2gene() (found in GWAS2Pathway)}
+mapSNP2gene() (found in GWAS2Pathway).}
 
 \item{setPerm}{(integer) set cycle of permutations to run
 default=1000}

@@ -5,22 +5,16 @@
 \title{Calculate selection statistics (LD) and perform exploratory analyses
 for two sets of variants via R snpStats package}
 \usage{
-LDstatsWPM(hcInDir, lcInDir, statistic = "R.squared", popNames = NULL,
-  outDir)
+LDstatsWPM(enrichDir, unenrichDir, pop1, pop2, outDir)
 }
 \arguments{
-\item{hcInDir}{(char) path to files with high-confidence pathway SNP lists}
+\item{enrichDir}{(char) path to selection-enriched pathway SNP lists}
 
-\item{lcInDir}{(char) path to files with low-confidence pathway SNP lists}
+\item{unenrichDir}{(char) path to unenriched pathway SNP lists}
 
-\item{statistic}{(char) function will generate both R squared and D prime
-LD statistics; choose either 'R.squared' or 'D.prime' for plotting and
-p value calculation (default="R.squared")
-NOTE: syntax is important!}
+\item{pop1}{(char) character code for the first population (controls).}
 
-\item{popNames}{(char) optional - character vector to set alternate
-population names in plots eg. c("European", "African") rather than
-"CEU" and "ASW"}
+\item{pop2}{(char) character code for the second population (cases).}
 
 \item{outDir}{(char) path to output directory}
 }

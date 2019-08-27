@@ -9,7 +9,7 @@ calcFST(genoF, realFam, outDir, outF)
 \arguments{
 \item{genoF}{(char) path to file with SNP genotype data (PLINK format).}
 
-\item{realFam}{(char) path to PLINK case/control coded fam file.}
+\item{realFam}{(char) path to PLINK population coded fam file.}
 
 \item{outDir}{(char) directory to store output files.}
 

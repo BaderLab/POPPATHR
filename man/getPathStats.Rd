@@ -5,7 +5,7 @@
 \title{Generates SNP lists per selection-enriched and unenriched pathway
 as determined by GSEA}
 \usage{
-getPathStats(genoF, resF, gseaStatF, snp2geneF, enrichNES = 0.3,
+getPathStats(genoF, resF, gseaStatF, snp2geneF, realFam, enrichNES = 0.3,
   unenrichNES = 0.1, enrichDir, unenrichDir)
 }
 \arguments{
@@ -18,6 +18,8 @@ i.e., CEU vs. YRI and CEU vs. LWK.}
 \item{gseaStatF}{(char) path to GSEA statistics file.}
 
 \item{snp2geneF}{(char) path to SNP-gene mapping file.}
+
+\item{realFam}{(char) path to PLINK population coded fam file.}
 
 \item{enrichNES}{(integer) NES cutoff to select validated selection-enriched
 pathways (default=0.3)}

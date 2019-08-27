@@ -4,7 +4,7 @@
 #' @param realF (char) path to file with real SNP association statistics
 #' @param pathF (char) path to pathway definitions GMT file
 #' @param snp2geneF (char) path to file with snp2gene mappings. Output of
-#' 		mapSNP2gene() (found in GWAS2Pathway)
+#' 		mapSNP2gene() (found in GWAS2Pathway).
 #' @param setPerm (integer) set cycle of permutations to run
 #' 		default=1000
 #' @param snp2genedist (integer) value for GSEA --distance.

@@ -3,7 +3,7 @@
 #-------------------------------------------------------------------------------
 # POPPATHR: Population-based pathway analysis of SNP-SNP coevolution
 # Special thanks to Shraddha Pai
-# Last modified 8 August 2019
+# Last modified 26 August 2019
 
 #-------------------------------------------------------------------------------
 ## PREPARE PIPELINE ##
@@ -18,7 +18,7 @@ annoDir <- sprintf("%s/anno", dataDir)
 if (!file.exists(annoDir)) dir.create(annoDir)
 
 # Execute script to get annotation files
-system("./sh/annotations.sh")
+#system("./sh/annotations.sh")
 
 geneF <- sprintf("%s/refGene.hg19.header.txt", annoDir) # NOTE originally downloaded 2017-10-30
 pathF <- list.files(pattern="*.gmt", path=annoDir, full.names=TRUE)
@@ -30,7 +30,7 @@ softwareDir <- sprintf("%s/software", dataDir)
 if (!file.exists(softwareDir)) dir.create(softwareDir)
 
 # Execute script to download external software
-system("./sh/software.sh")
+#system("./sh/software.sh")
 
 #-------------------------------------------------------------------------------
 ## DATA DOWNLOAD ##
@@ -39,7 +39,7 @@ genoDir <- sprintf("%s/genotypes", dataDir)
 if (!file.exists(genoDir)) dir.create(genoDir)
 
 # Execute script to download SNP genotype data
-system("./sh/genotypes.sh")
+#system("./sh/genotypes.sh")
 
 genoF <- sprintf("%s/HM3_2010_05_phase3", genoDir)
 popsF <- sprintf("%s/relationships_w_pops_041510.txt", genoDir)
@@ -47,7 +47,7 @@ popsF <- sprintf("%s/relationships_w_pops_041510.txt", genoDir)
 #-------------------------------------------------------------------------------
 ## EXTERNAL R PACKAGES ##
 library(librarian)
-pkgs <- c("plyr", "dplyr", "ggplot2", "data.table", "tools", "stringr",
+pkgs <- c("plyr", "dplyr", "ggplot2", "data.table", "stringr",
           "reshape2", "gdata", "RColorBrewer", "gridExtra", "cowplot",
           "utils", "GenomicRanges", "snpStats")
 shelf(pkgs, cran_repo="https://cran.r-project.org")
@@ -135,61 +135,66 @@ selPaths <- function(pop1, pop2) {
   Sys.sleep(3)
 }
 
-selPaths(pop1="CEU", pop2="YRI") # CEU vs YRI
-selPaths(pop1="CEU", pop2="LWK") # CEU vs LWK
+# Run CEU vs. YRI and CEU vs. LWK analyses
+pops_1 <- c("CEU", "CEU")
+pops_2 <- c("YRI", "LWK")
+mapply(selPaths, pops_1, pops_2)
 
 #-------------------------------------------------------------------------------
 ## STEP 2: Identify genetic coevolution within and bewteen pathways
 ### Generate SNP lists per selection-enriched and unenriched pathway
 message("\n**Generating SNP lists per selection-enriched and unenriched pathway(s).\n")
-ldDir <- sprintf("%s/ld", outDir)
-enrich   <- sprintf("%s/enriched", ldDir)
-unenrich <- sprintf("%s/unenriched", ldDir)
+
+### Write into directory of first analysis (eg. CEU_YRI)
+pop1=pops_1[1]
+pop2=pops_2[1]
+
+outDir <- list.files(pattern=sprintf("*%s_%s", pop1, pop2), path=getwd())
+ldDir       <- sprintf("%s/ld", outDir)
+enrichDir   <- sprintf("%s/enriched_paths", ldDir)
+unenrichDir <- sprintf("%s/unenriched_paths", ldDir)
 
 if (!file.exists(ldDir)) dir.create(ldDir)
-if (!file.exists(enrich)) dir.create(enrich)
-if (!file.exists(unenrich)) dir.create(unenrich)
+if (!file.exists(enrichDir)) dir.create(enrichDir)
+if (!file.exists(unenrichDir)) dir.create(unenrichDir)
 
-resDirs <- c(outDir, repDir)
-resF <- sprintf("%s/%s/%s/results.txt", resDirs, basename(gseaDir), basename(resDir))
+realFam <- sprintf("%s_%s_%s.fam", genoF, pop1, pop2)
 
-gseaStatF <- sprintf("%s/gseaStatFile.txt", dirname(resF))
-gseaLEoutF <- sprintf("%s/gseaLEout.txt", dirname(resF))
-testStatF <- sprintf("%s/%s/%s/marker%s.txt",
-                     resDirs, basename(gseaDir), basename(plinkDir), snpStat)
+### Get GSEA results files from each analysis
+resDirs <- list.files(pattern="*out", path=getwd())
+resF <- list.files(pattern="results.txt", path=sprintf("%s/gsea", resDirs), full.names=TRUE)
+gseaStatF <- sprintf("%s/gsea/gseaStatFile.txt", outDir)
+snp2geneF <- sprintf("%s/gsea/snp2gene.txt", outDir)
 
-source("getPathStats.R")
-getPathStats(genoF=genoF, resF, gseaStatF, snp2geneF,
-             enrichNES=hcNEScut, unenrichNES=lcNEScut,
-						 enrichDir=enrich, unenrichDir=unenrich)
+getPathStats(genoF=genoF, resF=resF,
+             gseaStatF=gseaStatF, snp2geneF=snp2geneF,
+             enrichNES=enrichNEScut, unenrichNES=unenrichNEScut,
+						 enrichDir=enrichDir, unenrichDir=unenrichDir)
 
 ### Calculate LD statisics for each enriched pathway compared
 message("\n**Calculating trans-chromosomal LD statistics.\n")
 
 #WPM (within-pathway model)
-statDir <- sprintf("%s/%s_%s_WPM", ldDir, basename(enrich), basename(unenrich))
+statDir <- sprintf("%s/WPM", ldDir)
 if (!file.exists(statDir)) dir.create(statDir)
-
-source("LDstatsWPM.R")
-LDstats(hcInDir=enrich, lcInDir=unenrich,
-        popNames=popNames, outDir=statDir)
+LDstatsWPM(enrichDir=enrichDir, unenrichDir=unenrichDir,
+           pop1=pop1, pop2=pop2, outDir=statDir)
 
 #BPM (between-pathway model)
-statDir <- sprintf("%s/%s_%s_BPM", ldDir, basename(enrich), basename(unenrich))
+statDir <- sprintf("%s/BPM", ldDir)
 if (!file.exists(statDir)) dir.create(statDir)
 
-source("LDstatsBPM.R")
-LDstats(hcInDir=enrich, lcInDir=unenrich, popNames=popNames,
-        snp2geneF=snp2geneF, outDir=statDir)
+LDstatsBPN(hcInDir=enrich, lcInDir=unenrich, popNames=popNames,
+           snp2geneF=snp2geneF, outDir=statDir)
 
 #-------------------------------------------------------------------------------
-### Getting gene properties for selection-enriched genes / variants
+## STEP3: Getting gene properties for selection-enriched genes / variants
 message("\n**Getting selection-enriched gene properties.\n")
 
 propDir <- sprintf("%s/geneProp", outDir)
 if (!file.exists(propDir)) dir.create(propDir)
 
-geneDir <- hcSnps
+geneDir <- enrichDir
 geneF  <- sprintf("%s/genes_leadingEdge_unique_hc.txt", geneDir)
 clustF <- sprintf("%s/gseaStat_per_hc_pathway_updated.txt", geneDir)
 
