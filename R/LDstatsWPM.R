@@ -10,8 +10,8 @@
 #' @return none
 #' @export
 #'
-LDstatsWPM <- function(enrichDir, unenrichDir, pop1, pop2, outDir) {
 
+LDstatsWPM <- function(enrichDir, unenrichDir, pop1, pop2, outDir) {
   # Calculate linkage disequilbrium statistics
   # NOTE: argument 'depth' specifies the max. separation b/w pairs of SNPs
   # to be considered, so that depth=1 would specify calculation of LD b/w
@@ -114,7 +114,7 @@ LDstatsWPM <- function(enrichDir, unenrichDir, pop1, pop2, outDir) {
   # combos <- function(n) {
   #   return( n*(n-1)/2 ) }
 
-  # Calculate inter-chromosomal LD stats for selection-enriched pathways
+  # Calculate inter-chromosomal LD stats within enriched pathways
   cat("=======================================================================")
   cat("**Measuring trans-chromosomal LD within selection-enriched pathways\n")
 
@@ -138,7 +138,7 @@ LDstatsWPM <- function(enrichDir, unenrichDir, pop1, pop2, outDir) {
   cat(" done.\n")
   Sys.sleep(3)
 
-  # Calculate inter-chromosomal LD stats for unenriched pathways
+  # Calculate inter-chromosomal LD stats within unenriched pathways
   cat("=======================================================================")
   cat("**Measuring trans-chromosomal LD within unenriched pathways\n")
 
@@ -163,15 +163,14 @@ LDstatsWPM <- function(enrichDir, unenrichDir, pop1, pop2, outDir) {
   Sys.sleep(3)
   cat("=======================================================================")
 
-  # Write out tables of interactions per pathway
+  # Write out tables of SNP-SNP interactions per pathway
+  col_pop1 <- sprintf("num_ixns_%s", pop1)
+  col_pop2 <- sprintf("num_ixns_%s", pop2)
+
   ## Enriched
   path_enrich <- list.files(path=enrichDir, pattern="*.snps$", full.names=FALSE)
   path_enrich <- gsub("\\%.*", "", path_enrich)
   path_enrich <- substr(path_enrich, 0, nchar(path_enrich)-5)
-
-  col_pop1 <- sprintf("num_ixns_%s", pop1)
-  col_pop2 <- sprintf("num_ixns_%s", pop2)
-
   enrich_df <- data.frame(pathway=path_enrich,
                           pop1=enrich.num.pop1,
                           pop2=enrich.num.pop2)
@@ -185,7 +184,6 @@ LDstatsWPM <- function(enrichDir, unenrichDir, pop1, pop2, outDir) {
   path_unenrich <- list.files(path=unenrichDir, pattern="*.snps$", full.names=FALSE)
   path_unenrich <- gsub("\\%.*", "", path_unenrich)
   path_unenrich <- substr(path_unenrich, 0, nchar(path_unenrich)-5)
-
   unenrich_df <- data.frame(pathway=path_unenrich,
                             pop1=unenrich.num.pop1,
                             pop2=unenrich.num.pop2)
@@ -261,7 +259,7 @@ LDstatsWPM <- function(enrichDir, unenrichDir, pop1, pop2, outDir) {
   both <- plot_grid(p1, p2, p3, p4, labels=c("A", "B", "C", "D"), ncol=2, nrow=2)
   title <- ggdraw() + draw_label(title, fontface="bold")
   both  <- plot_grid(title, both, ncol=1, rel_heights=c(0.1, 1))
-  filename <- sprintf("%s/snp-snp_interchrom_ld_r2.png", outDir)
+  filename <- sprintf("%s/within_snp-snp_interchrom_ld_r2.png", outDir)
   save_plot(filename, both, base_height=10, base_width=13.5, base_aspect_ratio=1.2)
   cat(sprintf(" saved to %s.\n", filename))
 
@@ -280,6 +278,7 @@ LDstatsWPM <- function(enrichDir, unenrichDir, pop1, pop2, outDir) {
     pvals_df <- data.frame(pathway=path_enrich,
                            pval=as.data.frame(pvals),
                            fdr=p.adjust(pvals, method="BH"))
+                           
     pvals_df <- pvals_df[order(pvals_df$fdr),]
     sig_paths <- filter(pvals_df, fdr <= 0.2)
     cat(sprintf("Pathways with significant coevolution in %s (FDR<=0.2, N=%s):\n%s\n",

@@ -8,6 +8,7 @@
 #' @return none
 #' @export
 #'
+
 calcFST <- function(genoF, realFam, outDir, outF) {
   # Set up PLINK to calculate MAF between case/control populations
   str1 <- sprintf("PLINK --bed %s.bed --bim %s.bim --fam %s", genoF, genoF, realFam)

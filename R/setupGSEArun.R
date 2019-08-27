@@ -18,6 +18,7 @@
 #' @return none
 #' @export
 #'
+
 setupGSEArun <- function(realF, pathF, snp2geneF,
 												 setPerm=1000L, snp2genedist=500000L,
 												 minGene=10L, maxGene=300L, setSeed=42L,

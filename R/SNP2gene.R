@@ -14,6 +14,7 @@
 #' @return none
 #' @export
 #'
+
 SNP2gene <- function(inF, geneF, marg=0L, outF) {
 	cat("* Reading SNP table\n")
 	snps <- fread(inF, h=FALSE, data.table=FALSE) # fread much faster than read.table

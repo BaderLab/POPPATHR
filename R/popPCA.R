@@ -11,6 +11,7 @@
 #' @return none
 #' @export
 #'
+
 popPCA <- function(genoF, famF, pop1, pop2, dimensions=3L, outF) {
   # Calculate PCA via PLINK
   str1 <- sprintf("PLINK --bed %s.bed --bim %s.bim --fam %s", genoF, genoF, famF)

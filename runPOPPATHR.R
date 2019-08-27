@@ -183,9 +183,8 @@ LDstatsWPM(enrichDir=enrichDir, unenrichDir=unenrichDir,
 #BPM (between-pathway model)
 statDir <- sprintf("%s/BPM", ldDir)
 if (!file.exists(statDir)) dir.create(statDir)
-
-LDstatsBPN(hcInDir=enrich, lcInDir=unenrich, popNames=popNames,
-           snp2geneF=snp2geneF, outDir=statDir)
+LDstatsBPM(enrichDir=enrichDir, unenrichDir=unenrichDir,
+           pop1=pop1, pop2=pop2, snp2geneF=snp2geneF, outDir=statDir)
 
 #-------------------------------------------------------------------------------
 ## STEP3: Getting gene properties for selection-enriched genes / variants

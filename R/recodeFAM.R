@@ -15,6 +15,7 @@
 #' @return none
 #' @export
 #'
+
 recodeFAM <- function(genoF, pop1, pop2, popsF,
 											setSeed=42L, caseCode=2, ctrlCode=1,
 											outF="case-ctrl") {

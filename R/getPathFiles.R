@@ -20,6 +20,7 @@
 #' @return none
 #' @export
 #'
+
 getPathStats <- function(genoF, resF, gseaStatF, snp2geneF, realFam,
 												 enrichNES=0.3, unenrichNES=0.1,
 											   enrichDir, unenrichDir) {
