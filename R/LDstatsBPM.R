@@ -15,8 +15,9 @@
 
 LDstatsBPM <- function(enrichDir, unenrichDir, pop1, pop2,
                        snp2geneF, outDir) {
-  # Read in snp2gene.txt file to assign SNPs to genes
-  snp2gene <- read.table(snp2geneF, h=F, as.is=T)
+  # Read in snp2gene file to assign SNPs to genes to remove any
+  # matching genes in a given pathway-pathway pair
+  snp2gene <- read.table(snp2geneF, h=FALSE, as.is=TRUE)
   snp2gene <- snp2gene[,-3]
 
   calcLD <- function(snpDir, popcode) {
@@ -27,9 +28,9 @@ LDstatsBPM <- function(enrichDir, unenrichDir, pop1, pop2,
     diff.r2 <- list(); diff.dp <- list()
 
     # Read PLINK files for each pathway
-    bed <- list.files(path=snpDir, pattern="*.bed", full.names=T)
-    bim <- list.files(path=snpDir, pattern="*.bim", full.names=T)
-    fam <- list.files(path=snpDir, pattern="*.fam", full.names=T)
+    bed <- list.files(path=snpDir, pattern="*.bed", full.names=TRUE)
+    bim <- list.files(path=snpDir, pattern="*.bim", full.names=TRUE)
+    fam <- list.files(path=snpDir, pattern="*.fam", full.names=TRUE)
 
     # Matrices of all possible pathway x pathway combinations
     bed.pair <- t(combn(bed, 2))
@@ -37,46 +38,42 @@ LDstatsBPM <- function(enrichDir, unenrichDir, pop1, pop2,
     fam.pair <- t(combn(fam, 2))
 
     for (i in 1:nrow(bed.pair)) {
-      cat(sprintf("#### BETWEEN-PATHWAY INTERACTION %i ####\n", i))
-      cat(sprintf("*Reading pathway %s x pathway %s PLINK sets\n",
-            basename(file_path_sans_ext(bed.pair[i,1])),
-            basename(file_path_sans_ext(bed.pair[i,2]))))
+      path.name1 <- substr(basename(bim.pair[i,1]), 0, nchar(basename(bim.pair[i,1]))-4)
+      path.name2 <- substr(basename(bim.pair[i,2]), 0, nchar(basename(bim.pair[i,2]))-4)
+
+      cat(sprintf("BETWEEN-PATHWAY INTERACTION %i (%s total)\n", i, nrow(bim.pair)))
+      cat(sprintf("*Reading SNPs in pathway %s x pathway %s\n", path.name1, path.name2))
 
       ss1[[i]] <- read.plink(bed.pair[i,1], bim.pair[i,1], fam.pair[i,1])
       ss2[[i]] <- read.plink(bed.pair[i,2], bim.pair[i,2], fam.pair[i,2])
 
       # Subset genotypes by population
-      # For first pathway of pathwayxpathway interaction
+      # For first pathway of pathway x pathway interaction
       pop <- which(ss1[[i]]$fam$affected == popcode)
       ss1[[i]]$genotypes <- ss1[[i]]$genotypes[pop, ]
-      cat(sprintf("\n*Keeping %i %s genotypes in pathway one of interaction\n",
-          length(pop),
-          if (popcode == 1) {pop1}
-          else if (popcode == 2) {pop2} ))
+      cat(sprintf("\n%i %s genotypes in pathway %s\n",
+          length(pop), ifelse(popcode == 1, pop1, pop2), path.name1))
       print(ss1[[i]]$genotypes)
 
-      # For second pathway of pathwayxpathway interaction
+      # For second pathway of pathway x pathway interaction
       pop <- which(ss2[[i]]$fam$affected == popcode)
       ss2[[i]]$genotypes <- ss2[[i]]$genotypes[pop, ]
-      cat(sprintf("\n*Keeping %i %s genotypes in pathway two of interaction\n",
-          length(pop),
-          if (popcode == 1) {pop1}
-          else if (popcode == 2) {pop2} ))
+      cat(sprintf("\n%i %s genotypes in pathway %s\n",
+          length(pop), ifelse(popcode == 1, pop1, pop2), path.name2))
       print(ss2[[i]]$genotypes)
 
-      cat("*Calculating pathway x pathway LD statistics...\n")
+      cat("\n*Calculating pathway x pathway LD statistics...\n")
       ld.calc[[i]] <- ld(x=ss1[[i]]$genotypes, y=ss2[[i]]$genotypes,
                          stats="R.squared")
 
-      snp.map1 <- ss1[[i]]$map #genomic location of each SNP
+      snp.map1 <- ss1[[i]]$map # genomic location of each SNP
       snp.map2 <- ss2[[i]]$map
 
-      r2 <- as.matrix(ld.calc[[i]]$R.squared) #convert sparseMatrix to regular matrix
-      r2 <- melt(r2) #melt matrix to data frame
+      r2 <- as.matrix(ld.calc[[i]]) # convert sparseMatrix to regular matrix
+      r2 <- melt(r2) # melt matrix to data frame
       colnames(r2)[3] <- "R.squared"
 
-      # Create dataframe containing pairwise distance calculations for each
-      # SNP-SNP pair
+      # Create dataframe with pairwise distance calculations for each SNP-SNP pair
       colnames(r2)[1:2] <- c("snp.name.1", "snp.name.2")
 
       snp.map1 <- subset(snp.map1, select=c("snp.name", "chromosome", "position"))
@@ -84,23 +81,22 @@ LDstatsBPM <- function(enrichDir, unenrichDir, pop1, pop2,
       snp.map2 <- subset(snp.map2, select=c("snp.name", "chromosome", "position"))
       colnames(snp.map2)[1] <- "snp.name.2"
 
-      pairwise <- merge(snp.map1, r2, by="snp.name.1")
+      pairwise <- join(snp.map1, r2, by="snp.name.1")
       colnames(pairwise)[1:3] <- c("snp_1", "chr_1", "pos_1")
-
-      pairwise <- merge(snp.map2, pairwise, by="snp.name.2")
+      pairwise <- join(snp.map2, pairwise, by="snp.name.2")
       colnames(pairwise) <- c("snp_2", "chr_2", "pos_2", "snp_1",
                               "chr_1", "pos_1", "R.squared")
-      pairwise <- pairwise[,c(4:6, 1:3, 7, 8)]
+      pairwise <- pairwise[,c(4:6, 1:3, 7)]
 
-      pairwise$pathway_pair1 <- basename(file_path_sans_ext(bed.pair[i,1]))
-      pairwise$pathway_pair2 <- basename(file_path_sans_ext(bed.pair[i,2]))
+      pairwise$pathway_pair1 <- path.name1
+      pairwise$pathway_pair2 <- path.name2
       pairwise$ixn_num <- sprintf("interaction_%i", i)
 
-      # Assign gene to each SNP
+      # Assign SNPs to genes
       colnames(snp2gene) <- c("snp_1", "gene_1")
-      pairwise.df <- merge(pairwise, snp2gene, by="snp_1")
+      pairwise.df <- join(pairwise, snp2gene, by="snp_1")
       colnames(snp2gene) <- c("snp_2", "gene_2")
-      pairwise.df <- merge(pairwise.df, snp2gene, by="snp_2")
+      pairwise.df <- join(pairwise.df, snp2gene, by="snp_2")
       cat(sprintf("\tTotal SNP-SNP interactions: %i\n", nrow(pairwise.df)))
 
       cat("*Removing any matching genes in pathway x pathway interaction...\n")
@@ -310,8 +306,8 @@ LDstatsBPM <- function(enrichDir, unenrichDir, pop1, pop2,
 
   # Merge both p value dataframes
   pval_merge <- join(res[[1]], res[[2]], by=c("interaction.pathway_pair1", "interaction.pathway_pair2"))
-  filename_3 <- sprintf("%s/enrich_coevolution_pval_merge_%s_%s.txt", outDir, pop1, pop2)
-  write.table(format(pval_merge, digits=3), file=filename_3,
+  filename_2 <- sprintf("%s/enrich_coevolution_pval_merge_%s_%s.txt", outDir, pop1, pop2)
+  write.table(format(pval_merge, digits=3), file=filename_2,
       col=TRUE, row=FALSE, quote=FALSE, sep="\t")
-  cat(sprintf("\n*Merged p-value tables written to %s.\n", filename_3))
+  cat(sprintf("\n*Merged p-value tables written to %s.\n", filename_2))
 }

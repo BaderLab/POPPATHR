@@ -278,7 +278,7 @@ LDstatsWPM <- function(enrichDir, unenrichDir, pop1, pop2, outDir) {
     pvals_df <- data.frame(pathway=path_enrich,
                            pval=as.data.frame(pvals),
                            fdr=p.adjust(pvals, method="BH"))
-                           
+
     pvals_df <- pvals_df[order(pvals_df$fdr),]
     sig_paths <- filter(pvals_df, fdr <= 0.2)
     cat(sprintf("Pathways with significant coevolution in %s (FDR<=0.2, N=%s):\n%s\n",
@@ -297,8 +297,8 @@ LDstatsWPM <- function(enrichDir, unenrichDir, pop1, pop2, outDir) {
 
   # Merge both p value dataframes
   pval_merge <- join(res[[1]], res[[2]], by="pathway")
-  filename_3 <- sprintf("%s/enrich_coevolution_pval_merge_%s_%s.txt", outDir, pop1, pop2)
-  write.table(format(pval_merge, digits=3), file=filename_3,
+  filename_2 <- sprintf("%s/enrich_coevolution_pval_merge_%s_%s.txt", outDir, pop1, pop2)
+  write.table(format(pval_merge, digits=3), file=filename_2,
       col=TRUE, row=FALSE, quote=FALSE, sep="\t")
-  cat(sprintf("\n*Merged p-value tables written to %s.\n", filename_3))
+  cat(sprintf("\n*Merged p-value tables written to %s.\n", filename_2))
 }

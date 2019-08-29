@@ -16,7 +16,8 @@ Imports:
   cowplot,
   utils,
   GenomicRanges,
-  snpStats
+  snpStats,
+  RCy3
 Authors@R: person("Catherine", "Ross", email = "catherinem.ross@utoronto.ca", role = c("aut", "cre"))
 Description: A bioinformatics package for determining pathway-level SNP coevolution driven by population-based positive selection.
 License: GPL (>= 2)

@@ -49,7 +49,7 @@ popsF <- sprintf("%s/relationships_w_pops_041510.txt", genoDir)
 library(librarian)
 pkgs <- c("plyr", "dplyr", "ggplot2", "data.table", "stringr",
           "reshape2", "gdata", "RColorBrewer", "gridExtra", "cowplot",
-          "utils", "GenomicRanges", "snpStats")
+          "utils", "GenomicRanges", "snpStats", "RCy3")
 shelf(pkgs, cran_repo="https://cran.r-project.org")
 
 # Load PopulationPathways R functions
@@ -175,16 +175,16 @@ getPathStats(genoF=genoF, resF=resF,
 message("\n**Calculating trans-chromosomal LD statistics.\n")
 
 #WPM (within-pathway model)
-statDir <- sprintf("%s/WPM", ldDir)
-if (!file.exists(statDir)) dir.create(statDir)
+wpmDir <- sprintf("%s/WPM", ldDir)
+if (!file.exists(wpmDir)) dir.create(wpmDir)
 LDstatsWPM(enrichDir=enrichDir, unenrichDir=unenrichDir,
-           pop1=pop1, pop2=pop2, outDir=statDir)
+           pop1=pop1, pop2=pop2, outDir=wpmDir)
 
 #BPM (between-pathway model)
-statDir <- sprintf("%s/BPM", ldDir)
-if (!file.exists(statDir)) dir.create(statDir)
+bpmDir <- sprintf("%s/BPM", ldDir)
+if (!file.exists(bpmDir)) dir.create(bpmDir)
 LDstatsBPM(enrichDir=enrichDir, unenrichDir=unenrichDir,
-           pop1=pop1, pop2=pop2, snp2geneF=snp2geneF, outDir=statDir)
+           pop1=pop1, pop2=pop2, snp2geneF=snp2geneF, outDir=bpmDir)
 
 #-------------------------------------------------------------------------------
 ## STEP3: Getting gene properties for selection-enriched genes / variants
