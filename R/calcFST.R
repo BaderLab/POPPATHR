@@ -6,6 +6,7 @@
 #' @param outF (char) path to write SNP-FST file.
 #'
 #' @return none
+#' @import data.table
 #' @export
 #'
 

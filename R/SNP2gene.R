@@ -12,6 +12,7 @@
 #' @param outF (char) path to write snp2gene mapping.
 #'
 #' @return none
+#' @import GenomicRanges, data.table
 #' @export
 #'
 

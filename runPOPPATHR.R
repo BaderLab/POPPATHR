@@ -49,7 +49,7 @@ popsF <- sprintf("%s/relationships_w_pops_041510.txt", genoDir)
 library(librarian)
 pkgs <- c("plyr", "dplyr", "ggplot2", "data.table", "stringr",
           "reshape2", "gdata", "RColorBrewer", "gridExtra", "cowplot",
-          "utils", "GenomicRanges", "snpStats", "RCy3")
+          "GenomicRanges", "snpStats", "RCy3")
 shelf(pkgs, cran_repo="https://cran.r-project.org")
 
 # Load PopulationPathways R functions

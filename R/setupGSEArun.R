@@ -16,6 +16,7 @@
 #' @param setSeed (integer) value for GSEA --seed
 #'
 #' @return none
+#' @import dplyr
 #' @export
 #'
 
