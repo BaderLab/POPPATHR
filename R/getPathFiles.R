@@ -18,7 +18,6 @@
 #' 		(PLINK files per unenriched pathway)
 #'
 #' @return none
-#' @import dplyr, stringr
 #' @export
 #'
 

@@ -9,7 +9,6 @@
 #' @param outF (char) path to write PNG image.
 #'
 #' @return none
-#' @import dplyr, ggplot2
 #' @export
 #'
 

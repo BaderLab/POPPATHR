@@ -8,7 +8,6 @@
 #' @param outDir (char) path to output directory
 #'
 #' @return none
-#' @import snpStats, reshape2, gdata, RColorBrewer, gridExtra, cowplot
 #' @export
 #'
 

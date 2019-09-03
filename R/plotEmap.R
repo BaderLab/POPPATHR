@@ -1,5 +1,5 @@
 #' Create EnrichmentMap in Cytoscape to visualize predictive pathways
-#' 
+#'
 #' @description Create a network where nodes are predictive pathways passing
 #' certain cutoff and edges indicate similarity in gene-sets. Pathways are then
 #' clustered to identify themes of predictive pathways. Generates one such
@@ -13,14 +13,14 @@
 #' @param outDir (char) path to directory where file should be stored.
 #' @param minScore (int) minimum score of node to show
 #' @param maxScore (int) maximum score of node to show
-#' @param colorScheme (char) colour scheme for nodes. "cont_heatmap" 
-#' sets a discrete map ranging from yellow to red for increasing scores. 
+#' @param colorScheme (char) colour scheme for nodes. "cont_heatmap"
+#' sets a discrete map ranging from yellow to red for increasing scores.
 #' "netDx_ms" is the colour scheme used in the netDx methods paper.
 #' This map is (<=6: white; 7-9: orange; 10: red)
 #' @param imageFormat (char) one of PNG, PDF, SVG, or JPEG
 #' @param verbose (logical) print messages
-#' @param createStyle (logical) if generating more than one EMap, set to 
-#' TRUE for first one and to FALSE for subsequent. Due to limitation in 
+#' @param createStyle (logical) if generating more than one EMap, set to
+#' TRUE for first one and to FALSE for subsequent. Due to limitation in
 #' current version of RCy3
 #' @examples
 #' #refer to writeEMapInput_many.R for working writeEMapInput_many() example
@@ -40,14 +40,15 @@
 #' if (!file.exists(outDir)) dir.create(outDir)
 #' gmtFile <- EMap_input[[1]][1]
 #' nodeAttrFile <- EMap_input[[1]][2]
-#' 
+#'
 #' # not run because requires Cytoscape to be installed and open
 #' # plotEmap(gmtFile = gmtFile, nodeAttrFile = nodeAttrFile, netName="HighRisk",
 #'	# outDir=outDir)
 #' @return Filename of image to which EnrichmentMap is exported. Also side
 #' effect of plotting the EnrichmentMap in an open session of Cytoscape.
-#' @import RCy3
 #' @export
+#'
+
 plotEmap <- function(gmtFile, nodeAttrFile, netName="generic",
 	outDir,minScore=1,maxScore=10,colorScheme="cont_heatmap",
 	imageFormat="png",verbose=FALSE,createStyle=TRUE){
@@ -75,7 +76,7 @@ plotEmap <- function(gmtFile, nodeAttrFile, netName="generic",
 
 ###  #annotate the network using AutoAnnotate app
   aa_command <- paste("autoannotate annotate-clusterBoosted",
-		"clusterAlgorithm=MCL", 
+		"clusterAlgorithm=MCL",
 	  "labelColumn=name",
 		"maxWords=3",
 		"network=", netName)
@@ -100,14 +101,14 @@ plotEmap <- function(gmtFile, nodeAttrFile, netName="generic",
 		if (colorScheme=="cont_heatmap") {
 			colfunc <- colorRampPalette(c("yellow", "red"))
 			gradient_cols <- colfunc(length(scoreVals))
-			style_cols <- colfunc(length(scoreVals)) 
+			style_cols <- colfunc(length(scoreVals))
 		} else if (colorScheme=="netDx_ms") {
-			if (minScore < 1 | maxScore > 10) 
+			if (minScore < 1 | maxScore > 10)
 				stop("The 'netDx_ms' colorScheme requires minScore and maxScore to be between 1 and 10.")
 			style_cols <- rep("white", length(scoreVals))
 			style_cols[which(scoreVals>=7)] <- "orange"
 			style_cols[which(scoreVals==10)] <- "red"
-	} 
+	}
 	nodeLabels <- mapVisualProperty('node label','name','p')
 	nodeFills <- mapVisualProperty('node fill color','maxScore','d',
 			scoreVals,style_cols)

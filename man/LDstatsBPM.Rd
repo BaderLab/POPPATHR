@@ -5,12 +5,16 @@
 \title{Calculate selection statistics (LD) and perform exploratory analyses
 for two sets of variants via R snpStats package}
 \usage{
-LDstatsBPM(hcInDir, lcInDir, snp2geneF, outDir)
+LDstatsBPM(enrichDir, unenrichDir, pop1, pop2, snp2geneF, outDir)
 }
 \arguments{
-\item{hcInDir}{(char) path to files with high-confidence pathway SNP lists}
+\item{enrichDir}{(char) path to selection-enriched pathway SNP lists}
 
-\item{lcInDir}{(char) path to files with low-confidence pathway SNP lists}
+\item{unenrichDir}{(char) path to unenriched pathway SNP lists}
+
+\item{pop1}{(char) character code for the first population (controls).}
+
+\item{pop2}{(char) character code for the second population (cases).}
 
 \item{snp2geneF}{(char) path to file with snp2gene mappings. Output of
 mapSNP2gene() (found in GWAS2Pathway)}
