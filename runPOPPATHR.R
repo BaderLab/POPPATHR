@@ -158,11 +158,13 @@ if (!file.exists(ldDir)) dir.create(ldDir)
 if (!file.exists(enrichDir)) dir.create(enrichDir)
 if (!file.exists(unenrichDir)) dir.create(unenrichDir)
 
+### Specify population-coded PLINK fam file
 realFam <- sprintf("%s_%s_%s.fam", genoF, pop1, pop2)
 
 ### Get GSEA results files from each analysis
 resDirs <- list.files(pattern="*out", path=getwd())
 resF <- list.files(pattern="results.txt", path=sprintf("%s/gsea", resDirs), full.names=TRUE)
+resEmF <- list.files(pattern="results_forEM.txt", path=sprintf("%s/gsea", resDirs), full.names=TRUE)
 gseaStatF <- sprintf("%s/gsea/gseaStatFile.txt", outDir)
 snp2geneF <- sprintf("%s/gsea/snp2gene.txt", outDir)
 

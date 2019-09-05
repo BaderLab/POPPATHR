@@ -77,12 +77,11 @@ setupGSEArun <- function(realF, pathF, snp2geneF,
 			outDir), sep="\t", col=TRUE, row=FALSE, quote=FALSE)
 
   # Format results for Cytoscape enrichment map
-	cat("\n\n*Formatting output for use in Cytoscape (Enrichment map)...")
-  dat <- dat %>% mutate(Description=Geneset)
-  dat <- subset(dat, select=c(Geneset, NominalP, FDR, Description))
-  dat <- dat[c("Geneset", "Description", "NominalP", "FDR")]
+	cat("\n\n*Formatting output for use in Cytoscape (EnrichmentMap)...")
+  dat$Description <- dat$Geneset
+  dat <- dat[c("Geneset", "Description", "NominalP", "FDR", "NES")]
   write.table(dat, file=sprintf("%s/results_forEM.txt", outDir),
-        			sep="\t", col=TRUE, row=FALSE, quote=FALSE)
+      sep="\t", col=TRUE, row=FALSE, quote=FALSE)
 	cat(" done.\n")
 
   # Cleanup
