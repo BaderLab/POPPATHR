@@ -4,16 +4,14 @@
 \alias{calcFST}
 \title{Calculates SNP-level FST values for use in setupGSEArun.R}
 \usage{
-calcFST(genoF, realFam, outDir, outF)
+calcFST(genoF, famF, outDir)
 }
 \arguments{
 \item{genoF}{(char) path to file with SNP genotype data (PLINK format).}
 
-\item{realFam}{(char) path to PLINK population coded fam file.}
+\item{famF}{(char) path to PLINK population coded fam file.}
 
 \item{outDir}{(char) directory to store output files.}
-
-\item{outF}{(char) path to write SNP-FST file.}
 }
 \value{
 none

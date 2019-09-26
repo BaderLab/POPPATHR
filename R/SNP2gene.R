@@ -9,16 +9,16 @@
 #' 		columns considered.
 #' @param geneF (char) path to refseq table with header.
 #' @param marg (integer) region upstream and downstream of [txStart,txEnd].
-#' @param outF (char) path to write snp2gene mapping.
+#' @param outDir (char) path to write snp-to-gene mapping.
 #'
 #' @return none
 #' @export
 #'
 
-SNP2gene <- function(inF, geneF, marg=0L, outF) {
+SNP2gene <- function(inF, geneF, marg=0L, outDir) {
 	cat("* Reading SNP table\n")
 	snps <- fread(inF, h=FALSE, data.table=FALSE) # fread much faster than read.table
-	snp_GR	<- GRanges(paste("chr", snps[,1], sep=""),
+	snp_GR  <- GRanges(paste("chr", snps[,1], sep=""),
 					  				 IRanges(snps[,4], snps[,4]),
 					  			 	 name=snps[,2])
 
@@ -33,20 +33,19 @@ SNP2gene <- function(inF, geneF, marg=0L, outF) {
 	end_GR		<- resize(gene_GR, fix="end", width=1L)
 
 	cat("* Computing distances\n")
-	# snps inside the gene domain
+	# SNPs inside the gene domain
 	d0		<- distanceToNearest(snp_GR, gene_GR, ignore.strand=TRUE)
 	dbit	<- d0@elementMetadata$distance
-	d_in	<- data.frame(
-				 queryHits=d0@from,
-				 subjectHits=d0@to,
-				 distance=dbit)
+	d_in	<- data.frame(queryHits=d0@from,
+											subjectHits=d0@to,
+											distance=dbit)
 
 	idx		<- which(dbit == 0)
 	out1	<- cbind(snp_GR$name[d_in$queryHits[idx]],
 					 			 gene_GR$name[d_in$subjectHits[idx]],
 					 		 	 d_in$distance[idx])
 
-	# snps outside gene domain
+	# SNPs outside gene domain
 	idx		<- which(dbit > 0) # not in a gene
 	snp2_GR <- snp_GR[idx]
 	cat(sprintf("%i SNPs not inside gene domain\n", length(idx)))
@@ -72,7 +71,7 @@ SNP2gene <- function(inF, geneF, marg=0L, outF) {
 
 	d_both	<- merge(d_start, d_end, by.x="queryHits", by.y="queryHits")
 
-	# start is closer than end
+	# Start is closer than end
 	idx		<- which(d_both$dbit.x < d_both$dbit.y);
 	out2	<- cbind(snp2_GR$name[d_both$queryHits[idx]],
 					 			 start_GR$name[d_both$subjectHits.x[idx]],
@@ -85,7 +84,9 @@ SNP2gene <- function(inF, geneF, marg=0L, outF) {
 					)
 
 	out <- rbind(out1, out2, out3)
+	outF <- sprintf("%s/snp2gene.txt", outDir)
+
 	cat("* Writing to output file\n")
-	options(scipen=10)  # do not convert numbers to sci notation
+	options(scipen=10)  # prevent conversion of numbers to sci notation
 	write.table(out, file=outF, sep="\t", col=FALSE, row=FALSE, quote=FALSE)
 }

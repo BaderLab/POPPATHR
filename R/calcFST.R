@@ -1,17 +1,17 @@
 #' Calculates SNP-level FST values for use in setupGSEArun.R
 #'
 #' @param genoF (char) path to file with SNP genotype data (PLINK format).
-#' @param realFam (char) path to PLINK population coded fam file.
+#' @param famF (char) path to PLINK population coded fam file.
 #' @param outDir (char) directory to store output files.
-#' @param outF (char) path to write SNP-FST file.
 #'
 #' @return none
 #' @export
 #'
 
-calcFST <- function(genoF, realFam, outDir, outF) {
+calcFST <- function(genoF, famF, outDir) {
+
   # Set up PLINK to calculate MAF between case/control populations
-  str1 <- sprintf("PLINK --bed %s.bed --bim %s.bim --fam %s", genoF, genoF, realFam)
+  str1 <- sprintf("PLINK --bed %s.bed --bim %s.bim --fam %s", genoF, genoF, famF)
   str2 <- sprintf("--fst case-control --allow-no-sex")
   str3 <- sprintf("--out %s", sprintf("%s/%s", outDir, basename(genoF)))
   cmd  <- sprintf("%s %s %s", str1, str2, str3)
@@ -26,6 +26,7 @@ calcFST <- function(genoF, realFam, outDir, outF) {
   # NOTE: header of column 2 is labelled "CHI2" for purposes of reading into
   # calculate_gsea.pl. This script explicitly accepts two header labels,
   # 'P' or 'CHI2' typically from GWAS. The column still contains SNP FST values.
+  outF <- sprintf("%s/markerFST.txt", outDir)
   cat(sprintf("*Writing out FST file to %s.\n", outF))
   write.table(fst_input, file=outF,
 		col.names=c("Marker", "CHI2"), row=FALSE, sep="\t", quote=FALSE)

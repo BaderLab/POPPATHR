@@ -70,7 +70,7 @@ unenrichNES <- 0.1 # abs NES threshold to define unenriched pathways
 
 #-------------------------------------------------------------------------------
 ## WORK BEGINS ##
-## STEP 1: Identify selection-enriched pathway gene sets
+## STEP 1: Identify selection-enriched pathway gene sets ##
 selPaths <- function(pop1, pop2) {
 
   ### Create dated output directory
@@ -90,40 +90,38 @@ selPaths <- function(pop1, pop2) {
       pop1, pop2, outDir, genoF, minGene, maxGene, snp2genedist/1000, setPerm))
   Sys.sleep(3)
 
+  ## Prepare inputs
+  ### Directories
+  pcaDir <- sprintf("%s/pca", outDir)
+  fstDir <- sprintf("%s/fst", outDir)
+  gseaDir <- sprintf("%s/gsea", outDir)
+  if (!file.exists(pcaDir)) dir.create(pcaDir)
+  if (!file.exists(fstDir)) dir.create(fstDir)
+  if (!file.exists(gseaDir)) dir.create(gseaDir)
+  ### Files
+  famName <- sprintf("%s_%s_%s", basename(genoF), pop1, pop2)
+  famF <- sprintf("%s_%s_%s.fam", genoF, pop1, pop2)
+  snpF <- sprintf("%s.bim", genoF)
+  pcaF <- sprintf("%s/%s", pcaDir, famName)
+
   ### Recode PLINK fam file to population coding
   message("\n**Getting case/control (i.e., population) status.\n")
-  # New PLINK file names after population recoding
-  famName <- sprintf("%s_%s_%s", basename(genoF), pop1, pop2)
   recodeFAM(genoF=genoF, pop1=pop1, pop2=pop2, popsF=popsF, outF=famName)
   Sys.sleep(3)
 
   ### Determine population substructure via PLINK --cluster
   message(sprintf("\n**Determining population substructure.\n"))
-  pcaDir <- sprintf("%s/pca", outDir)
-  if (!file.exists(pcaDir)) dir.create(pcaDir)
-
-  realFam <- sprintf("%s_%s_%s.fam", genoF, pop1, pop2)
-  pcaF <- sprintf("%s/%s", pcaDir, famName)
-  popPCA(genoF=genoF, famF=realFam, pop1=pop1, pop2=pop2, outF=pcaF)
+  popPCA(genoF=genoF, famF=famF, pop1=pop1, pop2=pop2, outF=pcaF)
   Sys.sleep(3)
 
   ### Calculate FST estimation per SNP between both populations
   message("\n**Calculating population SNP-level FST.\n")
-  fstDir <- sprintf("%s/fst", outDir)
-  if (!file.exists(fstDir)) dir.create(fstDir)
-
-  fstF <- sprintf("%s/markerFST.txt", fstDir)
-  calcFST(genoF=genoF, realFam=realFam, outF=fstF, outDir=fstDir)
+  calcFST(genoF=genoF, famF=famF, outDir=fstDir)
   Sys.sleep(3)
 
   ### Map input SNPs to genes
   message("\n**Mapping input SNPs to genes.\n")
-  gseaDir <- sprintf("%s/gsea", outDir)
-  if (!file.exists(gseaDir)) dir.create(gseaDir)
-
-  snpF <- sprintf("%s.bim", genoF)
-  snp2geneF <- sprintf("%s/snp2gene.txt", gseaDir)
-  SNP2gene(inF=snpF, geneF=geneF, outF=snp2geneF)
+  SNP2gene(inF=snpF, geneF=geneF, marg=0, outDir=gseaDir)
   Sys.sleep(3)
 
   ### Run GSEA
@@ -141,39 +139,52 @@ pops_2 <- c("YRI", "LWK")
 mapply(selPaths, pops_1, pops_2)
 
 #-------------------------------------------------------------------------------
-## STEP 2: Identify genetic coevolution within and bewteen pathways
-### Generate SNP lists per selection-enriched and unenriched pathway
+## STEP 2: Identify genetic coevolution within and bewteen pathways ##
+# Generate SNP lists per selection-enriched and unenriched pathway
 message("\n**Generating SNP lists per selection-enriched and unenriched pathway(s).\n")
 
-### Write into directory of first analysis (eg. CEU_YRI)
+## Use directory of first population analysis as default (eg. CEU_YRI)
 pop1=pops_1[1]
 pop2=pops_2[1]
 
-outDir <- list.files(pattern=sprintf("*%s_%s", pop1, pop2), path=getwd())
-ldDir       <- sprintf("%s/ld", outDir)
+## Get GSEA results files from each analysis
+### Directories
+resDirs  <- list.files(pattern="out", path=getwd(), full.names=TRUE)
+gseaDirs <- list.files(pattern="gsea", path=resDirs, full.names=TRUE)
+resDir  <- resDirs[grep(paste(pop1, pop2, sep="_"), resDirs)]
+gseaDir <- gseaDirs[grep(paste(pop1, pop2, sep="_"), gseaDirs)]
+### Files
+gseaStatF <- sprintf("%s/gseaStatFile.txt", gseaDir, resDir)
+snp2geneF <- sprintf("%s/snp2gene.txt", gseaDir, resDir)
+resF   <- list.files(pattern="results.txt", path=gseaDirs, full.names=TRUE)
+resEmF <- list.files(pattern="results_forEM.txt", path=gseaDirs, full.names=TRUE)
+
+## Output directories for inter-chromosomal analyses
+ldDir <- sprintf("%s/ld", outDir)
 enrichDir   <- sprintf("%s/enriched_paths", ldDir)
 unenrichDir <- sprintf("%s/unenriched_paths", ldDir)
-
 if (!file.exists(ldDir)) dir.create(ldDir)
 if (!file.exists(enrichDir)) dir.create(enrichDir)
 if (!file.exists(unenrichDir)) dir.create(unenrichDir)
 
-### Specify population-coded PLINK fam file
-realFam <- sprintf("%s_%s_%s.fam", genoF, pop1, pop2)
-
-### Get GSEA results files from each analysis
-resDirs <- list.files(pattern="*out", path=getwd())
-resF <- list.files(pattern="results.txt", path=sprintf("%s/gsea", resDirs), full.names=TRUE)
-resEmF <- list.files(pattern="results_forEM.txt", path=sprintf("%s/gsea", resDirs), full.names=TRUE)
-gseaStatF <- sprintf("%s/gsea/gseaStatFile.txt", outDir)
-snp2geneF <- sprintf("%s/gsea/snp2gene.txt", outDir)
-
+message("\n**Generating SNPs lists per enriched and unenriched pathway.\n")
 getPathStats(genoF=genoF, resF=resF,
              gseaStatF=gseaStatF, snp2geneF=snp2geneF,
              enrichNES=enrichNEScut, unenrichNES=unenrichNEScut,
 						 enrichDir=enrichDir, unenrichDir=unenrichDir)
 
-### Calculate LD statisics for each enriched pathway compared
+# Plot EnrichmentMap to visualize selection-enriched pathways
+eMapF <- unique(substr(basename(resEmF), 0, nchar(basename(resEmF))-4))
+eMapF <- sprintf("%s/%s_selEnrich.txt", gseaDir, eMapF)
+
+message("\n**Plotting EnrichmentMap from GSEA results data.\n")
+writeEmapF(resEmF=resEmF, enrichNES=0.3, outF=eMapF)
+plotEmap(gmtF=pathF, eMapF=eMapF, outDir,
+				 netName="generic", imageFormat="png",
+         verbose=FALSE)
+
+
+# Calculate LD statisics for each enriched pathway compared
 message("\n**Calculating trans-chromosomal LD statistics.\n")
 
 #WPM (within-pathway model)
@@ -189,7 +200,7 @@ LDstatsBPM(enrichDir=enrichDir, unenrichDir=unenrichDir,
            pop1=pop1, pop2=pop2, snp2geneF=snp2geneF, outDir=bpmDir)
 
 #-------------------------------------------------------------------------------
-## STEP3: Getting gene properties for selection-enriched genes / variants
+## STEP3: Getting gene properties for selection-enriched genes / variants ##
 message("\n**Getting selection-enriched gene properties.\n")
 
 propDir <- sprintf("%s/geneProp", outDir)
