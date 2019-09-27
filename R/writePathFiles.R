@@ -21,9 +21,9 @@
 #' @export
 #'
 
-getPathStats <- function(genoF, resF, gseaStatF, snp2geneF, realFam,
-												 enrichNES=0.3, unenrichNES=0.1,
-											   enrichDir, unenrichDir) {
+writePathFiles <- function(genoF, resF, gseaStatF, snp2geneF, realFam,
+												 	 enrichNES=0.3, unenrichNES=0.1,
+											   	 enrichDir, unenrichDir) {
 	# Merge GSEA results from both datasets and change column names
 	# so the results from each dataset can be identified after merging
 	pathRes <- lapply(resF, read.delim)

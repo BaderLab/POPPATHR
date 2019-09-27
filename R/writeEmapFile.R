@@ -11,7 +11,7 @@
 #' @export
 #'
 
-writeEmapF <- function(resEmF, enrichNES=0.3, outF) {
+writeEmapFile <- function(resEmF, enrichNES=0.3, outF) {
   # Read in GSEA results files formatted for EnrichmentMap and combine
   EMfiles <- lapply(resEmF, function(x) read.delim(x, h=TRUE, as.is=TRUE))
   colnames(EMfiles[[1]])[3:5] <- paste(colnames(EMfiles[[1]])[3:5], "1", sep="_")
