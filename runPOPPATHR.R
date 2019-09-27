@@ -168,17 +168,17 @@ if (!file.exists(enrichDir)) dir.create(enrichDir)
 if (!file.exists(unenrichDir)) dir.create(unenrichDir)
 
 message("\n**Generating SNPs lists per enriched and unenriched pathway.\n")
-getPathStats(genoF=genoF, resF=resF,
-             gseaStatF=gseaStatF, snp2geneF=snp2geneF,
-             enrichNES=enrichNEScut, unenrichNES=unenrichNEScut,
-						 enrichDir=enrichDir, unenrichDir=unenrichDir)
+writePathFiles(genoF=genoF, resF=resF,
+               gseaStatF=gseaStatF, snp2geneF=snp2geneF,
+               enrichNES=enrichNEScut, unenrichNES=unenrichNEScut,
+						   enrichDir=enrichDir, unenrichDir=unenrichDir)
 
 # Plot EnrichmentMap to visualize selection-enriched pathways
 eMapF <- unique(substr(basename(resEmF), 0, nchar(basename(resEmF))-4))
 eMapF <- sprintf("%s/%s_selEnrich.txt", gseaDir, eMapF)
 
 message("\n**Plotting EnrichmentMap from GSEA results data.\n")
-writeEmapF(resEmF=resEmF, enrichNES=0.3, outF=eMapF)
+writeEmapFile(resEmF=resEmF, enrichNES=0.3, outF=eMapF)
 plotEmap(gmtF=pathF, eMapF=eMapF, outDir,
 				 netName="generic", imageFormat="png",
          verbose=FALSE)
@@ -200,9 +200,15 @@ LDstatsBPM(enrichDir=enrichDir, unenrichDir=unenrichDir,
            pop1=pop1, pop2=pop2, snp2geneF=snp2geneF, outDir=bpmDir)
 
 #-------------------------------------------------------------------------------
-## STEP3: Getting gene properties for selection-enriched genes / variants ##
-message("\n**Getting selection-enriched gene properties.\n")
+## STEP 3: Getting gene properties for selection-enriched pathways ##
+message("\n**Cross-referencing selection-enriched interactions with BioGRID.\n")
+bgridDir <- sprintf("%s/biogrid", outDir)
+if (!file.exists(propDir)) dir.create(propDir)
 
+bgridF <- sprintf("%s/BIOGRID-ORGANISM-Homo_sapiens-3.4.163.tab2.txt", annoDir)
+getBiogrid(inF=bgridF)
+
+message("\n**Grabbing selection-enriched gene properties.\n")
 propDir <- sprintf("%s/geneProp", outDir)
 if (!file.exists(propDir)) dir.create(propDir)
 
