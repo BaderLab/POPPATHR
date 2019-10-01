@@ -32,7 +32,7 @@ plotEmap <- function(gmtF, eMapF, outDir, netName="generic",
 	}
 
 	em_command <- paste('enrichmentmap build analysisType="generic"',
-			'gmtFile=', gmtF,
+			'gmtFile=', pathF,
 			'enrichmentsDataset1=', eMapF,
 			'pvalue=', 1,
 			'qvalue=', 1,
@@ -56,7 +56,7 @@ plotEmap <- function(gmtF, eMapF, outDir, netName="generic",
  ### USE TO CREATE 'MASTER' PATHWAYS FROM SIMILAR GENE SETS (BPM ANALYSIS)
 
 	# Apply style
-	cat("* Creating or applying style\n")
+	cat("*Creating or applying style\n")
   styleName <- "EMapStyle"
 	defaults <- list("NODE_SHAPE"="ellipse",
   			"NODE_SIZE"=30,
@@ -70,10 +70,10 @@ plotEmap <- function(gmtF, eMapF, outDir, netName="generic",
 
 	setVisualStyle(styleName)
 	layoutNetwork("attributes-layout NodeAttribute=__mclCLuster")
-  redraw_command <- sprintf("autoannotate redraw network=%s",getNetworkSuid())
+  redraw_command <- sprintf("autoannotate redraw network=%s", getNetworkSuid())
   response <- commandsGET(redraw_command)
 	fitContent()
-  redraw_command <- sprintf("autoannotate redraw network=%s",getNetworkSuid())
+  redraw_command <- sprintf("autoannotate redraw network=%s", getNetworkSuid())
   response <- commandsGET(redraw_command)
 	fitContent()
 
