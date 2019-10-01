@@ -32,26 +32,17 @@ getBiogrid <- function(bgridF, inDir) {
   cmd <- sprintf("grep --colour=never -wf %s %s > %s", geneF, bgridF_2, outF)
   system(cmd)
 
-  # Annotate genes to respective selection-enriched pathway(s) to find
-  # within / between-pathway interactions
-  df <- read.delim(outF_2, h=F, as.is=T)
+  # Annotate genes to respective selection-enriched pathways to find
+  # within and between-pathway interactions
+  df <- read.delim(outF, h=FALSE, as.is=TRUE)
   names(df) <- names(gen_ixns)
 
-  # analyzing sel_enriched_gen_ixns file
-  dat <- read.delim("sel_enriched_gen_ixns_test.txt", h=T, as.is=T)
+
+  ## STOPPED HERE
+  ### Create separate table for within / between interactions
   table(dat$Pathway.Interaction.Type)
-
-  wpm <- filter(dat, Pathway.Interaction.Type == "Within")
-  bpm <- filter(dat, Pathway.Interaction.Type == "Between")
-  wb <- filter(dat, Pathway.Interaction.Type == "Within/Between")
-
-  table(wpm$Experimental.System)
-  table(bpm$Experimental.System)
-  table(wb$Experimental.System)
-
   genes <- c(dat$Official.Symbol.Interactor.A, dat$Official.Symbol.Interactor.B)
   length(unique(genes))
-  #[1] 122
 }
 
   ##
