@@ -56,7 +56,6 @@ shelf(pkgs, cran_repo="https://cran.r-project.org")
 # Load PopulationPathways R functions
 Rfun <- list.files(pattern="*.R", path="R", full.names=TRUE)
 mapply(source, Rfun)
-
 #-------------------------------------------------------------------------------
 ## USER-DEFINED PARAMETERS ##
 # GSEA function args
