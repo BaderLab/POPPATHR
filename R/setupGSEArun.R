@@ -61,15 +61,6 @@ setupGSEArun <- function(realF, pathF, snp2geneF,
 	# Write output to excel format
 	#write.xlsx(dat,file=sprintf("%s/results.xlsx", outDir), col=T, row=F)
 
-	# Tally number of pathways at sig. thresholds
-	sigPaths1 <- which(dat$FDR <= 0.1)
-	sigPaths2 <- which(dat$FDR <= 0.05)
-	cat("\n------SIGNIFICANT GSEA RESULTS------\n")
-	cat("Number of significantly enriched pathways (FDR <= 0.1):",
-			length(sigPaths1))
-	cat("\nNumber of significantly enriched pathways (FDR <= 0.05):",
-			length(sigPaths2))
-
 	# Write table of significant pathways to output directory
 	write.table(dat[sigPaths1,], file=sprintf("%s/pathways_FDR0.1.txt",
 			outDir), sep="\t", col=TRUE, row=FALSE, quote=FALSE)

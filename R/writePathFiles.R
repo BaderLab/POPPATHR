@@ -7,7 +7,7 @@
 #' 		i.e., CEU vs. YRI and CEU vs. LWK.
 #' @param gseaStatF (char) path to GSEA statistics file.
 #' @param snp2geneF (char) path to SNP-gene mapping file.
-#' @param realFam (char) path to PLINK population coded fam file.
+#' @param famF (char) path to PLINK population coded fam file.
 #' @param enrichNES (integer) NES cutoff to select validated selection-enriched
 #'		pathways (default=0.3)
 #' @param unenrichNES (integer) NES cutoff to select unenriched pathways
@@ -21,32 +21,33 @@
 #' @export
 #'
 
-writePathFiles <- function(genoF, resF, gseaStatF, snp2geneF, realFam,
+writePathFiles <- function(genoF, resF, gseaStatF, snp2geneF, famF,
 												 	 enrichNES=0.3, unenrichNES=0.1,
 											   	 enrichDir, unenrichDir) {
 	# Merge GSEA results from both datasets and change column names
 	# so the results from each dataset can be identified after merging
 	pathRes <- lapply(resF, read.delim)
 	for (i in seq_along(pathRes)) {
-		colnames(pathRes[[i]])[2:7] <- paste(colnames(pathRes[[i]][, c(2:7)]),
-																				 sprintf("res%i", i), sep="_")
+		colnames(pathRes[[i]])[2:7] <- paste(colnames(pathRes[[i]][, c(2:7)]), i, sep="_")
 	}
-
-	res_merge <- join(pathRes[[1]], pathRes[[2]], by="Geneset")
+	res_merge <- join_all(pathRes, by="Geneset")
 
 	pathStats <- function(pathSet, NEScut, outDir) {
 		# Get selection-enriched and unenriched pathways from GSEA results
 		if (pathSet == "enrich") {
 			cat(sprintf("*Determining %sed pathways from GSEA results...\n", pathSet))
 			cat(sprintf("  Selection-enriched NES threshold: %g\n", NEScut))
-			paths <- filter(res_merge,
-											NES_res1 >= NEScut & NES_res2 >= NEScut)
+			paths <- filter(res_merge, NES_1 >= NEScut & FDR_1 <= 0.05)
+			if (length(pathRes) > 1) { # filter by second population analysis if run
+				paths <- filter(res_merge, NES_2 >= NEScut & FDR_2 <= 0.05)
+			}
 		} else if (pathSet == "unenrich") {
 			cat(sprintf("*Determining %sed pathways from GSEA results...\n", pathSet))
 			cat(sprintf("\tUnenriched NES threshold: %g\n", NEScut))
-			paths <- filter(res_merge,
-											NES_res1 <= NEScut & NES_res1 >= -NEScut &
-											NES_res2 <= NEScut & NES_res2 >= -NEScut)
+			paths <- filter(res_merge, NES_1 <= NEScut & NES_1 >= -NEScut)
+			if (length(pathRes) > 1) { # filter by second population analysis if run
+				paths <- filter(res_merge, NES_2 <= NEScut & NES_2 >= -NEScut)
+			}
 		}
 		write.table(paths, file=sprintf("%s/results_%s.txt", outDir, pathSet),
 								col=TRUE, row=FALSE, quote=FALSE, sep="\t")
@@ -65,6 +66,7 @@ writePathFiles <- function(genoF, resF, gseaStatF, snp2geneF, realFam,
 		# Subset gseaStatFile.txt by enriched and unenriched pathways
 		## --colour-never flag specifically for OSX, issue with readLines reading
 		## ANSI color codes from grep output
+		cat(sprintf("*Subsetting GSEA statistics file for %sed pathways\n", pathSet))
 		system(sprintf("grep --colour=never -f %s %s > %s/gseaStatFile_%s.txt",
 							      pathsF, gseaStatF, outDir, pathSet))
 		statsF <- sprintf("%s/gseaStatFile_%s.txt", outDir, pathSet)
@@ -104,26 +106,29 @@ writePathFiles <- function(genoF, resF, gseaStatF, snp2geneF, realFam,
 
 			# Subset original PLINK file with each pathway SNP file and write out
 			# new set of files per pathway
+			outF <- substr(snp_file, 0, nchar(snp_file)-5)
 			str1 <- sprintf("PLINK --bed %s.bed --bim %s.bim --fam %s --extract %s",
-											genoF, genoF, realFam, snp_file)
-			str2 <- sprintf("--make-bed --allow-no-sex --out %s",
-											file_path_sans_ext(snp_file))
+											genoF, genoF, famF, snp_file)
+			str2 <- sprintf("--make-bed --allow-no-sex --out %s", outF)
 			cmd <- sprintf("%s %s", str1, str2)
 			system(cmd)
 		}
 
 		# Concatenate SNP files into master file
-		cat("*Combining all SNPs into master SNP file...")
-		system(sprintf("cat %s/*.snps > %s/snps_%s.txt", outDir, outDir, pathSet))
-		cat(sprintf(" file written to %s/snps_%s.txt.\n", outDir, pathSet))
+		concatFiles <- function(x) {
+			cat(sprintf("*Combining all %s into master file...", x))
+			outF <- sprintf("%s/%s_%s", outDir, x, pathSet)
+			system(sprintf("cat %s/*.%s > %s.txt", outDir, x, outF))
+			cat(sprintf(" file written to %s.txt.\n", outF))
 
-		cat("*Writing file with only unique SNPs...")
-		snps <- read.table(sprintf("%s/snps_%s.txt", outDir, pathSet), h=FALSE, as.is=TRUE)
-		snps_unique <- as.data.frame(unique(snps))
-		write.table(snps_unique,
-								file=sprintf("%s/snps_unique_%s.txt", outDir, pathSet),
-								col=FALSE, row=FALSE, quote=FALSE)
-		cat(sprintf(" file written to %s/snps_unique_%s.txt.\n", outDir, pathSet))
+			cat(sprintf("*Writing file with only unique %s...", x))
+			dat <- read.table(sprintf("%s.txt", outF), h=FALSE, as.is=TRUE)
+			dat_unique <- as.data.frame(unique(dat))
+			write.table(dat_unique, file=sprintf("%s_unique.txt", outF),
+									col=FALSE, row=FALSE, quote=FALSE)
+			cat(sprintf(" file written to %s_unique.txt.\n", outF))
+		}
+		mapply(concatFiles, c("snps", "genes"))
 	}
  # Run function for enriched and unenriched pathways
  set_list <- c("enrich", "unenrich")

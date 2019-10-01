@@ -22,6 +22,7 @@ if (!file.exists(annoDir)) dir.create(annoDir)
 
 geneF <- sprintf("%s/refGene.hg19.header.txt", annoDir) # NOTE originally downloaded 2017-10-30
 pathF <- list.files(pattern="*.gmt", path=annoDir, full.names=TRUE)
+bgridF <- sprintf("%s/BIOGRID-ORGANISM-Homo_sapiens-3.4.163.tab2.txt", annoDir)
 
 #-------------------------------------------------------------------------------
 ## SOFTWARE DOWNLOAD ##
@@ -72,12 +73,6 @@ unenrichNES <- 0.1 # abs NES threshold to define unenriched pathways
 ## WORK BEGINS ##
 ## STEP 1: Identify selection-enriched pathway gene sets ##
 selPaths <- function(pop1, pop2) {
-
-  ### Create dated output directory
-  message("\n**Creating output directory.\n")
-  dt <- format(Sys.Date(), "20%y%m%d")
-  outDir <- sprintf("%s/%s_out_%s_%s", dataDir, dt, pop1, pop2)
-  if (!file.exists(outDir)) dir.create(outDir)
 
   #sink(sprintf("%s/runPipeline.log", outDir))
   cat("Running pipeline with the following input data and parameters...\n")
@@ -133,9 +128,15 @@ selPaths <- function(pop1, pop2) {
   Sys.sleep(3)
 }
 
-# Run CEU vs. YRI and CEU vs. LWK analyses
+# Run population comparison analyses
 pops_1 <- c("CEU", "CEU")
 pops_2 <- c("YRI", "LWK")
+
+# Create output directory
+dt <- format(Sys.Date(), "20%y%m%d")
+outDir <- sprintf("%s/%s_out_%s_%s", dataDir, dt, pop1, pop2)
+if (!file.exists(outDir)) dir.create(outDir)
+
 mapply(selPaths, pops_1, pops_2)
 
 #-------------------------------------------------------------------------------
@@ -154,6 +155,7 @@ gseaDirs <- list.files(pattern="gsea", path=resDirs, full.names=TRUE)
 resDir  <- resDirs[grep(paste(pop1, pop2, sep="_"), resDirs)]
 gseaDir <- gseaDirs[grep(paste(pop1, pop2, sep="_"), gseaDirs)]
 ### Files
+famF <- sprintf("%s_%s_%s.fam", genoF, pop1, pop2)
 gseaStatF <- sprintf("%s/gseaStatFile.txt", gseaDir, resDir)
 snp2geneF <- sprintf("%s/snp2gene.txt", gseaDir, resDir)
 resF   <- list.files(pattern="results.txt", path=gseaDirs, full.names=TRUE)
@@ -168,9 +170,9 @@ if (!file.exists(enrichDir)) dir.create(enrichDir)
 if (!file.exists(unenrichDir)) dir.create(unenrichDir)
 
 message("\n**Generating SNPs lists per enriched and unenriched pathway.\n")
-writePathFiles(genoF=genoF, resF=resF,
+writePathFiles(genoF=genoF, resF=resF, famF=famF,
                gseaStatF=gseaStatF, snp2geneF=snp2geneF,
-               enrichNES=enrichNEScut, unenrichNES=unenrichNEScut,
+               enrichNES=enrichNES, unenrichNES=unenrichNES,
 						   enrichDir=enrichDir, unenrichDir=unenrichDir)
 
 # Plot EnrichmentMap to visualize selection-enriched pathways
@@ -178,11 +180,15 @@ eMapF <- unique(substr(basename(resEmF), 0, nchar(basename(resEmF))-4))
 eMapF <- sprintf("%s/%s_selEnrich.txt", gseaDir, eMapF)
 
 message("\n**Plotting EnrichmentMap from GSEA results data.\n")
-writeEmapFile(resEmF=resEmF, enrichNES=0.3, outF=eMapF)
-plotEmap(gmtF=pathF, eMapF=eMapF, outDir,
+writeEmapFile(resEmF=resEmF, enrichNES=enrichNES, outF=eMapF)
+plotEmap(gmtF=pathF, eMapF=eMapF, outDir=gseaDir,
 				 netName="generic", imageFormat="png",
          verbose=FALSE)
 
+#######################
+## NOTE need to get edge file from EnrichmentMap to get pathways from genesets
+## for BPM analysis
+#######################
 
 # Calculate LD statisics for each enriched pathway compared
 message("\n**Calculating trans-chromosomal LD statistics.\n")
@@ -205,8 +211,9 @@ message("\n**Cross-referencing selection-enriched interactions with BioGRID.\n")
 bgridDir <- sprintf("%s/biogrid", outDir)
 if (!file.exists(propDir)) dir.create(propDir)
 
-bgridF <- sprintf("%s/BIOGRID-ORGANISM-Homo_sapiens-3.4.163.tab2.txt", annoDir)
-getBiogrid(inF=bgridF)
+geneF <- sprintf("%s/genes_enrich_unique.txt", enrichDir)
+getBiogrid(bgridF=bgridF, geneF=geneF, outDir=bgridDir)
+
 
 message("\n**Grabbing selection-enriched gene properties.\n")
 propDir <- sprintf("%s/geneProp", outDir)
@@ -215,5 +222,4 @@ if (!file.exists(propDir)) dir.create(propDir)
 geneDir <- enrichDir
 geneF  <- sprintf("%s/genes_leadingEdge_unique_hc.txt", geneDir)
 clustF <- sprintf("%s/gseaStat_per_hc_pathway_updated.txt", geneDir)
-
 outDir=propDir
