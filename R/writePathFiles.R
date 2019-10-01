@@ -39,14 +39,14 @@ writePathFiles <- function(genoF, resF, gseaStatF, snp2geneF, famF,
 			cat(sprintf("  Selection-enriched NES threshold: %g\n", NEScut))
 			paths <- filter(res_merge, NES_1 >= NEScut & FDR_1 <= 0.05)
 			if (length(pathRes) > 1) { # filter by second population analysis if run
-				paths <- filter(res_merge, NES_2 >= NEScut & FDR_2 <= 0.05)
+				paths <- filter(paths, NES_2 >= NEScut & FDR_2 <= 0.05)
 			}
 		} else if (pathSet == "unenrich") {
 			cat(sprintf("*Determining %sed pathways from GSEA results...\n", pathSet))
 			cat(sprintf("\tUnenriched NES threshold: %g\n", NEScut))
 			paths <- filter(res_merge, NES_1 <= NEScut & NES_1 >= -NEScut)
 			if (length(pathRes) > 1) { # filter by second population analysis if run
-				paths <- filter(res_merge, NES_2 <= NEScut & NES_2 >= -NEScut)
+				paths <- filter(paths, NES_2 <= NEScut & NES_2 >= -NEScut)
 			}
 		}
 		write.table(paths, file=sprintf("%s/results_%s.txt", outDir, pathSet),

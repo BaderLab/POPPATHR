@@ -1,8 +1,9 @@
 #' Script to determine the fraction of within and between-pathway interaction
 #' discoveries supported by literature-based evidence (i.e., BioGRID)
 #'
-#' @param bgridF (char) path to BioGRID human interaction file
-#' @param geneF (char) path to selection-enriched gene file (written by writePathFiles.R)
+#' @param bgridF (char) path to BioGRID human interaction file.
+#' @param geneF (char) path to selection-enriched gene file (written by writePathFiles.R).
+#' @param outDir (char) path to write output files.
 #'
 #' @return none
 #' @export
@@ -23,13 +24,11 @@ getBiogrid <- function(bgridF, inDir) {
   gen_ixns$Author <- gsub(" ", "_", gen_ixns$Author) # replace spaces with underscore
 
   # Write out filtered table
-  bgridF_2 <- sprintf("%s_genetic_interactions.tab2.txt", substr(inF, 0, nchar(inF)-9))
+  bgridF_2 <- sprintf("%s_genetic_interactions.tab2.txt", substr(bgridF, 0, nchar(bgridF)-9))
   write.table(gen_ixns, bgridF_2, col=TRUE, row=FALSE, quote=FALSE, sep="\t")
 
-  # Find selection-enriched gene interactions in BioGRID
-  outF <- sprintf("%s/sel_enriched_gen_ixns_test.txt", dirname(outF))
-
-  # Run command
+  # Find selection-enriched gene interactions in BioGRID via grep
+  outF <- sprintf("%s/genes_enrich_biogrid.txt", outDir)
   cmd <- sprintf("grep --colour=never -wf %s %s > %s", geneF, bgridF_2, outF)
   system(cmd)
 

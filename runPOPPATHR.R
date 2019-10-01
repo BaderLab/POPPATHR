@@ -208,7 +208,7 @@ LDstatsBPM(enrichDir=enrichDir, unenrichDir=unenrichDir,
 ## STEP 3: Getting gene properties for selection-enriched pathways ##
 message("\n**Cross-referencing selection-enriched interactions with BioGRID.\n")
 bgridDir <- sprintf("%s/biogrid", outDir)
-if (!file.exists(propDir)) dir.create(propDir)
+if (!file.exists(bgridDir)) dir.create(bgridDir)
 
 geneF <- sprintf("%s/genes_enrich_unique.txt", enrichDir)
 getBiogrid(bgridF=bgridF, geneF=geneF, outDir=bgridDir)
