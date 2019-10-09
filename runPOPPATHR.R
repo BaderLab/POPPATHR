@@ -161,7 +161,7 @@ resF   <- list.files(pattern="results.txt", path=gseaDirs, full.names=TRUE)
 resEmF <- list.files(pattern="results_forEM.txt", path=gseaDirs, full.names=TRUE)
 
 ## Output directories for inter-chromosomal analyses
-ldDir <- sprintf("%s/ld", outDir)
+ldDir <- sprintf("%s/ld", resDir)
 enrichDir   <- sprintf("%s/enriched_paths", ldDir)
 unenrichDir <- sprintf("%s/unenriched_paths", ldDir)
 if (!file.exists(ldDir)) dir.create(ldDir)
@@ -180,9 +180,7 @@ eMapF <- sprintf("%s/%s_selEnrich.txt", gseaDir, eMapF)
 
 message("\n**Plotting EnrichmentMap from GSEA results data.\n")
 writeEmapFile(resEmF=resEmF, enrichNES=enrichNES, outF=eMapF)
-plotEmap(gmtF=pathF, eMapF=eMapF, outDir=gseaDir,
-				 netName="generic", imageFormat="png",
-         verbose=FALSE)
+plotEmap(gmtF=pathF, eMapF=eMapF, netName="selEnrich", imageFormat="png")
 
 #######################
 ## NOTE need to get edge file from EnrichmentMap to get pathways from genesets
