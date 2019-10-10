@@ -114,7 +114,7 @@ plotEmap <- function(gmtF, eMapF, outDir,
 	node_name <- as.character(node_name[,1])
 
 	# Create crude pathway names by selecting top 3 words in pathway group
-	# NOTE for future update of Cytoscape API to retrieve nodes in AutoAnnotate clusters
+	# NOTE potential future update of Cytoscape API to retrieve nodes in AutoAnnotate clusters
 	single_path <- node_name[-which(node_name %in% unlist(pathways))]
 	pathway_groups <- c(pathways, single_path)
 
