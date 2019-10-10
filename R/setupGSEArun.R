@@ -62,17 +62,10 @@ setupGSEArun <- function(realF, pathF, snp2geneF,
 	#write.xlsx(dat,file=sprintf("%s/results.xlsx", outDir), col=T, row=F)
 
 	# Write table of significant pathways to output directory
-	write.table(dat[sigPaths1,], file=sprintf("%s/pathways_FDR0.1.txt",
-			outDir), sep="\t", col=TRUE, row=FALSE, quote=FALSE)
-	write.table(dat[sigPaths2,], file=sprintf("%s/pathways_FDR0.05.txt",
-			outDir), sep="\t", col=TRUE, row=FALSE, quote=FALSE)
-
-  # Format results for Cytoscape enrichment map
-	cat("\n\n*Formatting output for use in Cytoscape (EnrichmentMap)...")
-  dat$Description <- dat$Geneset
-  dat <- dat[c("Geneset", "Description", "NominalP", "FDR", "NES")]
-  write.table(dat, file=sprintf("%s/results_forEM.txt", outDir),
-      sep="\t", col=TRUE, row=FALSE, quote=FALSE)
+	write.table(dat[sigPaths1,], file=sprintf("%s/pathways_FDR0.1.txt", outDir),
+		sep="\t", col=TRUE, row=FALSE, quote=FALSE)
+	write.table(dat[sigPaths2,], file=sprintf("%s/pathways_FDR0.05.txt", outDir),
+		sep="\t", col=TRUE, row=FALSE, quote=FALSE)
 	cat(" done.\n")
 
   # Cleanup

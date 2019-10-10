@@ -11,7 +11,7 @@
 #' @export
 #'
 
-LDstatsWPM <- function(enrichDir, unenrichDir, pop1, pop2, outDir) {
+SNPassocWPM <- function(enrichDir, unenrichDir, pop1, pop2, outDir) {
   # Calculate linkage disequilbrium statistics
   # NOTE: argument 'depth' specifies the max. separation b/w pairs of SNPs
   # to be considered, so that depth=1 would specify calculation of LD b/w

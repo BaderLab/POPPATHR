@@ -140,9 +140,6 @@ mapply(selPaths, pops_1, pops_2)
 
 #-------------------------------------------------------------------------------
 ## STEP 2: Identify genetic coevolution within and bewteen pathways ##
-# Generate SNP lists per selection-enriched and unenriched pathway
-message("\n**Generating SNP lists per selection-enriched and unenriched pathway(s).\n")
-
 ## Use directory of first population analysis as default (eg. CEU_YRI)
 pop1=pops_1[1]
 pop2=pops_2[1]
@@ -151,56 +148,55 @@ pop2=pops_2[1]
 ### Directories
 resDirs  <- list.files(pattern="out", path=getwd(), full.names=TRUE)
 gseaDirs <- list.files(pattern="gsea", path=resDirs, full.names=TRUE)
-resDir  <- resDirs[grep(paste(pop1, pop2, sep="_"), resDirs)]
+resDir <- resDirs[grep(paste(pop1, pop2, sep="_"), resDirs)]
 gseaDir <- gseaDirs[grep(paste(pop1, pop2, sep="_"), gseaDirs)]
 ### Files
 famF <- sprintf("%s_%s_%s.fam", genoF, pop1, pop2)
 gseaStatF <- sprintf("%s/gseaStatFile.txt", gseaDir, resDir)
 snp2geneF <- sprintf("%s/snp2gene.txt", gseaDir, resDir)
-resF   <- list.files(pattern="results.txt", path=gseaDirs, full.names=TRUE)
-resEmF <- list.files(pattern="results_forEM.txt", path=gseaDirs, full.names=TRUE)
+resF <- list.files(pattern="results.txt", path=gseaDirs, full.names=TRUE)
 
-## Output directories for inter-chromosomal analyses
-ldDir <- sprintf("%s/ld", resDir)
-enrichDir   <- sprintf("%s/enriched_paths", ldDir)
-unenrichDir <- sprintf("%s/unenriched_paths", ldDir)
-if (!file.exists(ldDir)) dir.create(ldDir)
+## Output directories for inter-chromosomal SNP association analyses
+assocDir <- sprintf("%s/assoc", resDir)
+enrichDir   <- sprintf("%s/enriched", assocDir)
+enrichEmDir <- sprintf("%s/enriched_eMap", assocDir)
+unenrichDir <- sprintf("%s/unenriched", assocDir)
+if (!file.exists(assocDir)) dir.create(assocDir)
 if (!file.exists(enrichDir)) dir.create(enrichDir)
+if (!file.exists(enrichEmDir)) dir.create(enrichEmDir)
 if (!file.exists(unenrichDir)) dir.create(unenrichDir)
 
+# Plot EnrichmentMap to visualize selection-enriched pathways
+message("\n**Plotting EnrichmentMap from GSEA results.\n")
+eMapF <- unique(substr(basename(resF), 0, nchar(basename(resF))-4))
+eMapF <- sprintf("%s/%s_eMap.txt", gseaDir, eMapF)
+
+writeEmapFile(resF=resF, enrichNES=enrichNES, outF=eMapF)
+plotEmap(gmtF=pathF, eMapF=eMapF, outDir=enrichEmDir,
+         netName="selEnrich", imageFormat="png")
+
+# Write SNP/gene files per enriched and unenriched pathway
 message("\n**Generating SNPs lists per enriched and unenriched pathway.\n")
 writePathFiles(genoF=genoF, resF=resF, famF=famF,
                gseaStatF=gseaStatF, snp2geneF=snp2geneF,
                enrichNES=enrichNES, unenrichNES=unenrichNES,
-						   enrichDir=enrichDir, unenrichDir=unenrichDir)
+						   enrichDir=enrichDir, enrichEmDir=enrichEmDir,
+               unenrichDir=unenrichDir)
 
-# Plot EnrichmentMap to visualize selection-enriched pathways
-eMapF <- unique(substr(basename(resEmF), 0, nchar(basename(resEmF))-4))
-eMapF <- sprintf("%s/%s_selEnrich.txt", gseaDir, eMapF)
+# Calculate SNP association statisics for selection-enriched pathways
+message("\n**Calculating trans-chromosomal SNP association statistics.\n")
 
-message("\n**Plotting EnrichmentMap from GSEA results data.\n")
-writeEmapFile(resEmF=resEmF, enrichNES=enrichNES, outF=eMapF)
-plotEmap(gmtF=pathF, eMapF=eMapF, netName="selEnrich", imageFormat="png")
-
-#######################
-## NOTE need to get edge file from EnrichmentMap to get pathways from genesets
-## for BPM analysis
-#######################
-
-# Calculate LD statisics for each enriched pathway compared
-message("\n**Calculating trans-chromosomal LD statistics.\n")
-
-#WPM (within-pathway model)
-wpmDir <- sprintf("%s/WPM", ldDir)
+## WPM (within-pathway model)
+wpmDir <- sprintf("%s/WPM", assocDir)
 if (!file.exists(wpmDir)) dir.create(wpmDir)
-LDstatsWPM(enrichDir=enrichDir, unenrichDir=unenrichDir,
-           pop1=pop1, pop2=pop2, outDir=wpmDir)
+SNPassocWPM(enrichDir=enrichDir, unenrichDir=unenrichDir,
+            pop1=pop1, pop2=pop2, outDir=wpmDir)
 
-#BPM (between-pathway model)
-bpmDir <- sprintf("%s/BPM", ldDir)
+## BPM (between-pathway model)
+bpmDir <- sprintf("%s/BPM", assocDir)
 if (!file.exists(bpmDir)) dir.create(bpmDir)
-LDstatsBPM(enrichDir=enrichDir, unenrichDir=unenrichDir,
-           pop1=pop1, pop2=pop2, snp2geneF=snp2geneF, outDir=bpmDir)
+SNPassocBPM(enrichDir=enrichEmDir, unenrichDir=unenrichDir,
+            pop1=pop1, pop2=pop2, snp2geneF=snp2geneF, outDir=bpmDir)
 
 #-------------------------------------------------------------------------------
 ## STEP 3: Getting gene properties for selection-enriched pathways ##

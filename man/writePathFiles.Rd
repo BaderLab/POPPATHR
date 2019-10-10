@@ -5,8 +5,8 @@
 \title{Generates SNP lists per selection-enriched and unenriched pathway
 as determined by GSEA}
 \usage{
-writePathFiles(genoF, resF, gseaStatF, snp2geneF, famF, enrichNES = 0.3,
-  unenrichNES = 0.1, enrichDir, unenrichDir)
+writePathFiles(genoF, resF, gseaStatF, snp2geneF, famF, enrichNES = 3,
+  unenrichNES = 0.1, enrichDir, enrichEmDir, unenrichDir)
 }
 \arguments{
 \item{genoF}{(char) path to file with SNP genotype data (PLINK format).}
@@ -22,16 +22,19 @@ i.e., CEU vs. YRI and CEU vs. LWK.}
 \item{famF}{(char) path to PLINK population coded fam file.}
 
 \item{enrichNES}{(integer) NES cutoff to select validated selection-enriched
-pathways (default=0.3)}
+pathways (default=3)}
 
 \item{unenrichNES}{(integer) NES cutoff to select unenriched pathways
 (default=0.1)}
 
 \item{enrichDir}{(char) path to directory to store output files
-(PLINK files per validated selection-enriched pathway)}
+(PLINK files per selection-enriched gene set)}
+
+\item{enrichEmDir}{(char) path to directory to store output files
+(PLINK files per selection-enriched pathway, grouped via AutoAnnotate)}
 
 \item{unenrichDir}{(char) path to directory to store output files
-(PLINK files per unenriched pathway)}
+(PLINK files per unenriched gene set)}
 }
 \value{
 none

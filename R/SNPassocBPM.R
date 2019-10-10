@@ -13,8 +13,8 @@
 #' @export
 #'
 
-LDstatsBPM <- function(enrichDir, unenrichDir, pop1, pop2,
-                       snp2geneF, outDir) {
+SNPassocBPM <- function(enrichDir, unenrichDir, pop1, pop2,
+                        snp2geneF, outDir) {
   # Read in snp2gene file to assign SNPs to genes to remove any
   # matching genes in a given pathway-pathway pair
   snp2gene <- read.table(snp2geneF, h=FALSE, as.is=TRUE)
