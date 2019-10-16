@@ -62,7 +62,7 @@ SNPassocBPM <- function(enrichDir, unenrichDir, pop1, pop2,
           length(pop), ifelse(popcode == 1, pop1, pop2), path.name2))
       print(ss2[[i]]$genotypes)
 
-      cat("\n*Calculating pathway x pathway LD statistics...\n")
+      cat("\n*Calculating pathway x pathway SNP association statistics...\n")
       ld.calc[[i]] <- ld(x=ss1[[i]]$genotypes, y=ss2[[i]]$genotypes,
                          stats="R.squared")
 
@@ -121,7 +121,7 @@ SNPassocBPM <- function(enrichDir, unenrichDir, pop1, pop2,
 
   # Calculate inter-chromosomal LD stats between enriched pathways
   cat("=======================================================================")
-  cat("**Measuring trans-chromosomal LD between selection-enriched pathways\n")
+  cat("**Measuring trans-chromosomal SNP association between selection-enriched pathways\n")
 
   # population 1 genotypes only
   cat(sprintf("\n========== AMONG %s GENOTYPES ==========\n", pop1))
@@ -145,14 +145,14 @@ SNPassocBPM <- function(enrichDir, unenrichDir, pop1, pop2,
 
   # Calculate inter-chromosomal LD stats between unenriched pathways
   cat("=======================================================================")
-  cat("**Measuring trans-chromosomal LD between unenriched pathways\n")
+  cat("**Measuring trans-chromosomal SNP assocation between unenriched pathways\n")
 
   # population 1 genotypes only
   cat(sprintf("\n========== AMONG %s GENOTYPES ==========\n", pop1))
   calcLD(snpDir=unenrichDir, popcode=1)
   unenrich.pop1 <- diff.pairs
   unenrich.pop1$set <- "Unenriched"
-  unenrich.pop11$pop <- pop1
+  unenrich.pop1$pop <- pop1
   unenrich.num.pop1 <- diff.num
   cat(" done.\n")
   Sys.sleep(3)
@@ -195,11 +195,8 @@ SNPassocBPM <- function(enrichDir, unenrichDir, pop1, pop2,
     sprintf("%s/unenrich_num_interactions_pathway-pathway.txt", outDir),
       col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 
-  unenrich.num.pop1[unenrich.num.pop1==0] <- NA
-  unenrich.num.pop1 <- na.omit(unenrich.num.pop1)
-
-  unenrich.num.pop2[unenrich.num.pop2==0] <- NA
-  unenrich.num.pop2 <- na.omit(unenrich.num.pop2)
+  unenrich.num.pop1 <- unenrich.num.pop1[which(unenrich.num.pop1 != 0)]
+  unenrich.num.pop2 <- unenrich.num.pop2[which(unenrich.num.pop2 != 0)]
 
   ## PLOT STATS
   cat("\n*Generating inter-chromosomal LD plots and analyses.\n")
@@ -230,7 +227,7 @@ SNPassocBPM <- function(enrichDir, unenrichDir, pop1, pop2,
 
   # Population-specific pairwise inter-chromosomal r2 per enriched pathway
   title <- "Pathway-specific SNP-SNP coevolution between enriched pathways"
-  r2.xaxis.title <- "LD value per SNP-SNP pair"
+  r2.xaxis.title <- "SNP-SNP association (r2)"
 
   # Merge all results together
   dat <- rbind(enrich.pop1, unenrich.pop1, enrich.pop2, unenrich.pop2)
@@ -241,7 +238,7 @@ SNPassocBPM <- function(enrichDir, unenrichDir, pop1, pop2,
 
   # 1a) Density distribution plot
   p1 <- ggplot(dat, aes(x=R.squared, colour=ixn_num, fill=ixn_num)) +
-         facet_grid(set ~ pop) +
+         facet_grid(set~pop) +
          geom_density(alpha=0.2) +
          xlab(r2.xaxis.title) +
          ylab(bquote(bold("Density"))) +
@@ -252,7 +249,7 @@ SNPassocBPM <- function(enrichDir, unenrichDir, pop1, pop2,
 
   # 1b) eCDF plot (cumulative density at each r2)
   p2 <- ggplot(dat, aes(x=R.squared, colour=ixn_num)) +
-          facet_grid(set ~ pop) +
+          facet_grid(set~pop) +
           stat_ecdf() +
           xlab(r2.xaxis.title) +
           ylab(bquote(bold("Cumulative density"))) +
@@ -260,7 +257,7 @@ SNPassocBPM <- function(enrichDir, unenrichDir, pop1, pop2,
           theme(legend.position="none",
                 strip.text=element_text(face="bold"))
 
-  # 3c,d) Density and eCDF at x-axis > 0.2
+  # 3c,d) Density and eCDF at r2 > 0.2
   p3 <- p1 + xlim(0.2, 1)
   p4 <- p2 + xlim(0.2, 1)
 

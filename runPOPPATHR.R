@@ -3,7 +3,7 @@
 #-------------------------------------------------------------------------------
 # POPPATHR: Population-based pathway analysis of SNP-SNP coevolution
 # Special thanks to Shraddha Pai
-# Last modified 26 August 2019
+# Last modified 16 October 2019
 
 #-------------------------------------------------------------------------------
 ## PREPARE PIPELINE ##
@@ -66,7 +66,7 @@ snp2genedist <- 500000L # Max. SNP-gene mapping distance
 
 # GSEA result filtering args
 enrichNES   <- 3   # NES threshold to define selection-enriched pathways
-unenrichNES <- 0.1 # abs NES threshold to define unenriched pathways
+unenrichNES <- 0.1 # NES threshold to define unenriched pathways
 
 #-------------------------------------------------------------------------------
 ## WORK BEGINS ##

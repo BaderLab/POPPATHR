@@ -67,9 +67,6 @@ plotEmap <- function(gmtF, eMapF, outDir,
 	redraw_command <- sprintf("autoannotate redraw network=%s",getNetworkSuid())
   response <- commandsGET(redraw_command)
 	fitContent()
-  redraw_command <- sprintf("autoannotate redraw network=%s", getNetworkSuid())
-  response <- commandsGET(redraw_command)
-	fitContent()
 
 	# Pull node names from AutoAnnotated clusters
 	# Get node and edge table that have the cluster annotations
