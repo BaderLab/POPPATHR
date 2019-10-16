@@ -23,7 +23,7 @@ plotEmap <- function(gmtF, eMapF, outDir,
 									   netName="generic", imageFormat="png") {
 
 	# Confirm that Cytoscape is installed and opened
-	cytoscapeVersionInfo()
+	#cytoscapeVersionInfo()
 
   # Create EM using given parameters
 	if (netName %in% getNetworkList()) {
@@ -71,72 +71,64 @@ plotEmap <- function(gmtF, eMapF, outDir,
   response <- commandsGET(redraw_command)
 	fitContent()
 
-	# Retrieve edge overlap data to reconstruct gene set clusters (i.e. pathways)
-	edge <- commandsPOST("edge get attribute")
-	edge_name <- as.data.frame(unlist(lapply(edge, '[', "name")))
-	edge_name <- strsplit(as.character(edge_name[,1]), " \\(Geneset_Overlap_Dataset 1) ")
+	# Pull node names from AutoAnnotated clusters
+	# Get node and edge table that have the cluster annotations
+	node_table <- getTableColumns(table="node", network=getNetworkSuid())
+	edge_table <- getTableColumns(table="edge", network=getNetworkSuid())
 
-	# Initialize values
-	len <- length(edge_name)
-	ks <- NULL
-	rem <- NULL
+	# Get the correct attribute names
+	descr_attrib <- colnames(node_table)[grep(colnames(node_table), pattern="GS_DESCR")]
 
-	for (i in 1:len) {
-		int_k <- i+1
-		if (int_k > len) {
-			cat("*Merged pathway list generated\n")
-			break
-		}
-		for (k in int_k:len) {
-			if (length(which(edge_name[[i]] %in% edge_name[[k]])) >= 1) {
-				edge_name[[i]] <- union(edge_name[[i]], edge_name[[k]])
-			}
-			ks <- c(ks, k)
-		}
-		for (j in ks) {
-			if (length(which(edge_name[[i]] %in% edge_name[[j]])) >= 1) {
-				rem <- c(rem, j)
-			}
-		}
-		if (length(rem)) {
-			edge_name <- edge_name[-rem]
-		}
-		len <- length(edge_name)
-		rem <- NULL
-		ks <- NULL
+	# Get all the cluster numbers
+	cluster_num <- node_table$'__mclCluster'
+
+	# Get the unique set of clusters
+	set_clusters <- unique(cluster_num)
+	set_clusters <- set_clusters[which(set_clusters != 0)]
+
+	# Calculate the cluster names using AutoAnnotate and collate all the nodes
+	# associated with each cluster
+	cluster_names <- c()
+
+	for (i in 1:length(set_clusters)) {
+	  current_cluster <- set_clusters[i]
+	  gs_cluster <- node_table$name[which(node_table$'__mclCluster' == current_cluster)]
+
+	  #for this cluster of gs get the gs descr to use in defining in autoannotate
+	  gs_cluster_suid <- node_table$SUID[which(node_table$name %in% gs_cluster)]
+	  suids_aa <- paste("SUID", gs_cluster_suid, sep=":")
+
+	  #get the annotation for the given cluster
+	  curernt_name = NULL
+	  aa_label <- paste("autoannotate label-clusterBoosted",
+				"labelColumn=", descr_attrib,
+				"maxWords=3",
+				"nodeList=", paste(suids_aa, collapse=","))
+
+	  current_name <- commandsGET(aa_label)
+	  cluster_names <- rbind(cluster_names,
+			c(current_cluster, current_name, length(gs_cluster), paste(gs_cluster, collapse=";"))
+		)
 	}
 
-	pathways <- edge_name
-
-	# Retrieve node data to get un-annotated gene sets (single pathways)
-	node <- commandsPOST("node get attribute")
-	node_name <- as.data.frame(unlist(lapply(node, '[', "name")))
-	node_name <- as.character(node_name[,1])
-
-	# Create crude pathway names by selecting top 3 words in pathway group
-	# NOTE potential future update of Cytoscape API to retrieve nodes in AutoAnnotate clusters
-	single_path <- node_name[-which(node_name %in% unlist(pathways))]
-	pathway_groups <- c(pathways, single_path)
-
-	for (x in seq_along(pathway_groups)) {
-		path <- gsub("\\%.*", "", pathway_groups[[x]])
-		path_split <- unlist(strsplit(path, " "))
-		# Remove small words (to omit words such as "of", "the", "as", etc)
-		if (length(path_split) > 3) {
-			small_words <- which(nchar(path_split) <= 3)
-			if (length(small_words)) {
-				path_split <- path_split[-small_words]
-			}
-			top <- sort(table(path_split), decreasing=TRUE)[1:3]
-			names(pathway_groups)[x] <- paste(names(top), collapse="_")
-		}
-		else {
-			names(pathway_groups)[x] <- paste(path_split, collapse="_")
-		}
+	# Create list of cluster names and associated pathways
+	pathway_list <- list()
+	for (k in 1:nrow(clusters)) {
+		pathway_list[[k]] <- unlist(strsplit(cluster_names[k,4], ";"))
+		names(pathway_list)[k] <- gsub(" ", "_", toupper(cluster_names[k,2]))
 	}
+
+	# Get single unclustered gene sets and add to list
+	single_path <- node_table[-which(node_table$name %in% unlist(pathway_list)),]$name
+	# Remove annotation info from gene set names
+	single_path_name <- gsub("\\%.*", "", single_path)
+	single_path_name <- gsub(" ", "_", single_path_name)
+	names(single_path) <- single_path_name
+	# Add to existing list
+	pathway_list <- c(pathway_list, single_path)
 
 	# Write out rda file with pathway groupings
-	save(pathway_groups, file=sprintf("%s/pathway_groups.rda", outDir))
+	save(pathway_list, file=sprintf("%s/pathway_groups.rda", outDir))
 
 	# Write out EnrichmentMap to eMapF directory
 	outF <- substr(eMapF, 0, nchar(eMapF)-4)
