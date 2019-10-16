@@ -91,11 +91,11 @@ plotEmap <- function(gmtF, eMapF, outDir,
 	  current_cluster <- set_clusters[i]
 	  gs_cluster <- node_table$name[which(node_table$'__mclCluster' == current_cluster)]
 
-	  #for this cluster of gs get the gs descr to use in defining in autoannotate
+	  # For this cluster of gs get the gs descr to use in defining in AutoAnnotate
 	  gs_cluster_suid <- node_table$SUID[which(node_table$name %in% gs_cluster)]
 	  suids_aa <- paste("SUID", gs_cluster_suid, sep=":")
 
-	  #get the annotation for the given cluster
+	  # Get the annotation for the given cluster
 	  curernt_name = NULL
 	  aa_label <- paste("autoannotate label-clusterBoosted",
 				"labelColumn=", descr_attrib,
