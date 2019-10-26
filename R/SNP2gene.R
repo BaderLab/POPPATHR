@@ -9,13 +9,13 @@
 #' 		columns considered.
 #' @param geneF (char) path to refseq table with header.
 #' @param marg (integer) region upstream and downstream of [txStart,txEnd].
-#' @param outDir (char) path to write snp-to-gene mapping.
+#' @param outF (char) path to write snp-to-gene mapping file.
 #'
 #' @return none
 #' @export
 #'
 
-SNP2gene <- function(inF, geneF, marg=0L, outDir) {
+SNP2gene <- function(inF, geneF, marg=0L, outF) {
 	cat("* Reading SNP table\n")
 	snps <- fread(inF, h=FALSE, data.table=FALSE) # fread much faster than read.table
 	snp_GR  <- GRanges(paste("chr", snps[,1], sep=""),
@@ -84,7 +84,6 @@ SNP2gene <- function(inF, geneF, marg=0L, outDir) {
 					)
 
 	out <- rbind(out1, out2, out3)
-	outF <- sprintf("%s/snp2gene.txt", outDir)
 
 	cat("* Writing to output file\n")
 	options(scipen=10)  # prevent conversion of numbers to sci notation

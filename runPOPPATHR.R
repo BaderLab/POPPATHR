@@ -48,9 +48,12 @@ popsF <- sprintf("%s/relationships_w_pops_041510.txt", genoDir)
 #-------------------------------------------------------------------------------
 ## EXTERNAL R PACKAGES ##
 library(librarian)
-pkgs <- c("plyr", "dplyr", "ggplot2", "data.table", "stringr",
-          "reshape2", "gdata", "RColorBrewer", "gridExtra", "cowplot",
-          "GenomicRanges", "snpStats", "RCy3")
+# tidyverse for dplyr, ggplot2, stringr
+pkgs <- c("tidyverse", "data.table", "reshape2", "gdata", "RColorBrewer",
+          "gridExtra", "cowplot", "GenomicRanges", "snpStats", "RCy3")
+#pkgs <- c("plyr", "dplyr", "ggplot2", "data.table", "stringr",
+#          "reshape2", "gdata", "RColorBrewer", "gridExtra", "cowplot",
+#          "GenomicRanges", "snpStats", "RCy3")
 shelf(pkgs, cran_repo="https://cran.r-project.org")
 
 # Load PopulationPathways R functions
@@ -97,6 +100,8 @@ selPaths <- function(pop1, pop2) {
   famF <- sprintf("%s_%s_%s.fam", genoF, pop1, pop2)
   snpF <- sprintf("%s.bim", genoF)
   pcaF <- sprintf("%s/%s", pcaDir, famName)
+  fstF <- sprintf("%s/markerFST.txt", fstDir)
+  snp2geneF <- sprintf("%s/snp2gene.txt", gseaDir)
 
   ### Recode PLINK fam file to population coding
   message("\n**Getting case/control (i.e., population) status.\n")
@@ -110,12 +115,12 @@ selPaths <- function(pop1, pop2) {
 
   ### Calculate FST estimation per SNP between both populations
   message("\n**Calculating population SNP-level FST.\n")
-  calcFST(genoF=genoF, famF=famF, outDir=fstDir)
+  calcFST(genoF=genoF, famF=famF, outDir=fstDir, outF=fstF)
   Sys.sleep(3)
 
   ### Map input SNPs to genes
   message("\n**Mapping input SNPs to genes.\n")
-  SNP2gene(inF=snpF, geneF=geneF, marg=0, outDir=gseaDir)
+  SNP2gene(inF=snpF, geneF=geneF, marg=0, outF=snp2geneF)
   Sys.sleep(3)
 
   ### Run GSEA
