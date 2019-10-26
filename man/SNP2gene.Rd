@@ -5,7 +5,7 @@
 \title{Maps SNPs to their nearest genes (for use in setupGSEArun.R)
 (adapted from map_SNP2gene from SP's GWAS2pathway package)}
 \usage{
-SNP2gene(inF, geneF, marg = 0L, outDir)
+SNP2gene(inF, geneF, marg = 0L, outF)
 }
 \arguments{
 \item{inF}{(char) path to PLINK .bim file (only CHR, SNP, and BP
@@ -15,7 +15,7 @@ columns considered.}
 
 \item{marg}{(integer) region upstream and downstream of [txStart,txEnd].}
 
-\item{outDir}{(char) path to write snp-to-gene mapping.}
+\item{outF}{(char) path to write snp-to-gene mapping file.}
 }
 \value{
 none

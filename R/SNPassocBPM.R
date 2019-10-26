@@ -113,7 +113,7 @@ SNPassocBPM <- function(enrichDir, unenrichDir, pop1, pop2,
     }
 
     diff.pairs <<- do.call("rbind", diff)
-    diff.num <<- sapply(diff.r2, length)  # all SNP-SNP pairs per interaction
+    diff.num <<- sapply(diff.r2, length)  # all SNP-SNP pairs per pathway interaction
 
     cat(sprintf("Finished inter-chr LD analysis for %i pathway x pathway interactions.\n",
         nrow(bed.pair)))
@@ -195,30 +195,26 @@ SNPassocBPM <- function(enrichDir, unenrichDir, pop1, pop2,
     sprintf("%s/unenrich_num_interactions_pathway-pathway.txt", outDir),
       col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 
+  # Get pathway pairs with at least 1 inter-chrom SNP-SNP association
   unenrich.num.pop1 <- unenrich.num.pop1[which(unenrich.num.pop1 != 0)]
   unenrich.num.pop2 <- unenrich.num.pop2[which(unenrich.num.pop2 != 0)]
 
   ## PLOT STATS
   cat("\n*Generating inter-chromosomal LD plots and analyses.\n")
-  # Function to determine significance of inter-chrom LD per selection-enriched
-  # between-pathway interaction vs. cumulative set of unenriched pathways
+  # Function to determine significance of inter-chrom LD SNP assocition between
+  # selection-enriched pathways vs. cumulative set of unenriched pathways
   # via the KS test (alternative=less{the CDF of x lies below+right of y})
   getPvals <- function(dat, pop_name) {
     # Separate df into 'Enriched' and 'Unenriched' interactions
-    if (is.null(pop.name) == TRUE) {
-      enriched <- filter(dat, set=="Enriched")
-      unenriched <- filter(dat, set=="Unenriched")
-    } else { #population-stratified
-      enriched <- filter(dat, pop==pop_name & set=="Enriched")
-      unenriched <- filter(dat, pop==pop_name & set=="Unenriched")
-   }
+    enriched <- filter(dat, pop==pop_name & set=="Enriched")
+    unenriched <- filter(dat, pop==pop_name & set=="Unenriched")
 
     for (i in 1:length(unique(enriched$ixn_num))) {
       # Subset for each enriched pathway
-      enrich_ixn_ld[[i]] <<- subset(enriched, ixn_num==sprintf("interaction_%s", i))
+      enrich_path_ld[[i]] <<- subset(enriched, ixn_num==sprintf("interaction_%s", i))
       # Calculate KS pvalue for each enriched pathway against the entire
-      # set of unenriched pathways
-      ks_pvals[[i]] <<- ks.test(enrich_ixn_ld[[i]]$R.squared,
+      # set of unenriched pathways; calculated per population
+      ks_pvals[[i]] <<- ks.test(enrich_path_ld[[i]]$R.squared,
                                 unenriched$R.squared,
                                 alternative="less")
       ks_pvals[[i]] <<- ks_pvals[[i]]$p.value
@@ -261,20 +257,20 @@ SNPassocBPM <- function(enrichDir, unenrichDir, pop1, pop2,
   p3 <- p1 + xlim(0.2, 1)
   p4 <- p2 + xlim(0.2, 1)
 
-  cat("\n*Generating plot...")
-  both <- plot_grid(p1, p2, p3, p4, labels=c("A", "B", "C", "D"), ncol=2, nrow=2)
-  title <- ggdraw() + draw_label(title, fontface="bold")
-  both  <- plot_grid(title, both, ncol=1, rel_heights=c(0.1, 1))
-  filename <- sprintf("%s/between_snp-snp_interchrom_ld_r2.png", outDir)
-  save_plot(filename, both, base_height=10, base_width=13.5, base_aspect_ratio=1.2)
-  cat(sprintf(" saved to %s.\n", filename))
+#  cat("\n*Generating plot...")
+#  both <- plot_grid(p1, p2, p3, p4, labels=c("A", "B", "C", "D"), ncol=2, nrow=2)
+#  title <- ggdraw() + draw_label(title, fontface="bold")
+#  both  <- plot_grid(title, both, ncol=1, rel_heights=c(0.1, 1))
+#  filename <- sprintf("%s/between_snp-snp_interchrom_ld_r2.png", outDir)
+#  save_plot(filename, both, base_height=10, base_width=13.5, base_aspect_ratio=1.2)
+#  cat(sprintf(" saved to %s.\n", filename))
 
-  # Calculate p values per population
+  # Calculate pathway-level p values per population
   enrich_path_ld <- list()
   ks_pvals <- list()
   res <- list()
 
-  cat("*Determining significant SNP-SNP coevolution within enriched pathways.\n")
+  cat("*Determining significant SNP-SNP coevolution between enriched pathways.\n")
   calcCoev <- function(pop) {
     # p value function defined above
     getPvals(dat=dat, pop_name=pop)

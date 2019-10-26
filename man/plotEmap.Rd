@@ -18,9 +18,9 @@ used for between-pathway SNP association analysis.}
 
 \item{imageFormat}{(char) one of PNG, PDF, SVG, or JPEG.
 
-# not run because requires Cytoscape to be installed and open
-# plotEmap(gmtFile = gmtF, nodeAttrFile = nodeAttrFile, netName="HighRisk",
-# outDir=outDir).}
+# Not run because requires Cytoscape to be installed and open.
+# plotEmap(gmtF=pathF, eMapF=eMapF, outDir=enrichEmDir,
+    netName="generic", imageFormat="png").}
 }
 \value{
 Filename of image to which EnrichmentMap is exported. Also side
