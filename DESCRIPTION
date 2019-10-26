@@ -4,11 +4,8 @@ Version: 1.0
 Date: 2019-08-08
 Depends: R (>= 3.5.0)
 Imports:
-  plyr,
-  dplyr,
-  ggplot2,
+  tidyverse,
   data.table,
-  stringr,
   reshape2,
   gdata,
   RColorBrewer,
