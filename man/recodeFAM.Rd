@@ -2,35 +2,37 @@
 % Please edit documentation in R/recodeFAM.R
 \name{recodeFAM}
 \alias{recodeFAM}
-\title{Recodes PLINK fam file to case/control format by population
+\title{Recodes PLINK fam file with population-specific codes
 adapted from SP plink_baseSetup.R (part of GWAS2pathway package)}
 \usage{
-recodeFAM(genoF, pop1, pop2, popsF, setSeed = 42L, caseCode = 2,
-  ctrlCode = 1, outF = "case-ctrl")
+recodeFAM(
+  genotype_file,
+  pop_one,
+  pop_two,
+  population_table,
+  SET_SEED = 42,
+  out_file = "population-coded"
+)
 }
 \arguments{
-\item{genoF}{(char) path to file with SNP genotype data (PLINK format)}
+\item{genotype_file}{(char) path to file with SNP genotype data (PLINK format)}
 
-\item{pop1}{(char) character code for the first population (controls).}
+\item{pop_one}{(char) character code for the first population.}
 
-\item{pop2}{(char) character code for the second population (cases).}
+\item{pop_two}{(char) character code for the second population.}
 
-\item{popsF}{(char) path to file with population information.
+\item{population_table}{(char) path to file with population information.
 Gives the number of samples per population in the dataset.}
 
-\item{setSeed}{(integer) value for set.seed() before shuffling (default=42).}
+\item{SET_SEED}{(integer) value for set.seed() before shuffling (default=42).}
 
-\item{caseCode}{(integer) value for case samples in fam phenotype column.}
-
-\item{ctrlCode}{(integer) value for control samples in fam phenotype column.}
-
-\item{outF}{(char) optional - name for fam file (default=case-ctrl).
+\item{out_file}{(char) optional; name for fam file (default=population-coded).
 file extension added.}
 }
 \value{
 none
 }
 \description{
-Recodes PLINK fam file to case/control format by population
+Recodes PLINK fam file with population-specific codes
 adapted from SP plink_baseSetup.R (part of GWAS2pathway package)
 }

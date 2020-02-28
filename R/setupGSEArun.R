@@ -1,50 +1,50 @@
 #' Sets up and runs GSEA using population-based FST
 #' table containing GSEA results (Geneset, Size, ES, NES, NominalP, FDR, FWER)
 #'
-#' @param realF (char) path to file with real SNP association statistics
-#' @param pathF (char) path to pathway definitions GMT file
-#' @param snp2geneF (char) path to file with snp2gene mappings. Output of
+#' @param fst_file (char) path to file with SNP-level FST statistics
+#' @param annotation_file (char) path to pathway definitions GMT file
+#' @param snp2gene_file (char) path to file with snp2gene mappings. Output of
 #' 		mapSNP2gene() (found in GWAS2Pathway).
-#' @param setPerm (integer) set cycle of permutations to run
+#' @param SET_PERM (integer) set cycle of permutations to run
 #' 		default=1000
-#' @param snp2genedist (integer) value for GSEA --distance.
-#'		Max. distance between SNP and gene for their association in snp2geneF
-#' @param minGene (integer) value for GSEA --setmin.
+#' @param SNP2GENE_DIST (integer) value for GSEA --distance.
+#'		Max. distance between SNP and gene for their association in snp2gene_file
+#' @param MIN_GENE (integer) value for GSEA --setmin.
 #' 		Min. number of genes in a gene set to be considered
-#' @param maxGene (integer) value for GSEA --setmax.
+#' @param MAX_GENE (integer) value for GSEA --setmax.
 #' 		Max. number of genes in a gene set to be considered
-#' @param setSeed (integer) value for GSEA --seed
+#' @param SET_SEED (integer) value for GSEA --seed
 #'
 #' @return none
 #' @export
 #'
 
-setupGSEArun <- function(realF, pathF, snp2geneF,
-												 setPerm=1000L, snp2genedist=500000L,
-												 minGene=10L, maxGene=300L, setSeed=42L,
-												 outDir) {
+setupGSEArun <- function(fst_file, annotation_file, snp2gene_file,
+												 SET_PERM=SET_PERM, SNP2GENE_DIST=SNP2GENE_DIST,
+												 MIN_GENE=MIN_GENE, MAX_GENE=MAX_GENE, SET_SEED=42,
+												 output_folder) {
 	# Setup and run GSEA
- 	statOut <- sprintf("%s/gseaStatFile.txt", outDir)
- 	leOut	  <- sprintf("%s/gseaLEout.txt", outDir)
- 	resOut  <- sprintf("%s/results.txt", outDir)
+ 	statOut <- sprintf("%s/gseaStatFile.txt", output_folder)
+ 	leOut	  <- sprintf("%s/gseaLEout.txt", output_folder)
+ 	resOut  <- sprintf("%s/results.txt", output_folder)
 
 	# Run genotype-permuted GSEA
 	cat("* Running genotype-based permutations\n\n")
 	genoPermCom <- paste("calculate_gsea.pl %s %s --mapfile %s --cycle %i",
 											 "--setstatfile %s --leout %s --setmin %i --setmax %i",
 											 "--seed %i --distance %i --log %s/calculate_gsea.log")
-	cmd <- sprintf(genoPermCom, realF, pathF, snp2geneF,
-								 setPerm, statOut, leOut, minGene, maxGene,
-								 setSeed, snp2genedist, outDir)
+	cmd <- sprintf(genoPermCom, fst_file, annotation_file, snp2gene_file,
+								 SET_PERM, statOut, leOut, MIN_GENE, MAX_GENE,
+								 SET_SEED, SNP2GENE_DIST, output_folder)
   system(cmd)
 
   # Combine GSEA results
 	system(sprintf("combine_gsea.pl %s/calculate_gsea.log > %s/combined_res.log",
-		  outDir, outDir))
+		  output_folder, output_folder))
 
   # Format results for output
-	cat("*Formatting results for output...")
-  dat <- read.delim(sprintf("%s/combined_res.log", outDir),
+	cat("* Formatting results for output...")
+  dat <- read.delim(sprintf("%s/combined_res.log", output_folder),
 		skip=1, h=FALSE, as.is=TRUE)
   dat[,1] <- sub("Geneset=","",	 dat[,1])
   dat[,2] <- sub("Size=","",		 dat[,2])
@@ -59,15 +59,15 @@ setupGSEArun <- function(realF, pathF, snp2geneF,
 	cat(" done.\n")
 
 	# Write output to excel format
-	#write.xlsx(dat,file=sprintf("%s/results.xlsx", outDir), col=T, row=F)
+	#write.xlsx(dat,file=sprintf("%s/results.xlsx", output_folder), col=TRUE, row=FALSE)
 
 	# Write table of significant pathways to output directory
-	write.table(dat[sigPaths1,], file=sprintf("%s/pathways_FDR0.1.txt", outDir),
+	write.table(dat[sigPaths1,], file=sprintf("%s/pathways_FDR0.1.txt", output_folder),
 		sep="\t", col=TRUE, row=FALSE, quote=FALSE)
-	write.table(dat[sigPaths2,], file=sprintf("%s/pathways_FDR0.05.txt", outDir),
+	write.table(dat[sigPaths2,], file=sprintf("%s/pathways_FDR0.05.txt", output_folder),
 		sep="\t", col=TRUE, row=FALSE, quote=FALSE)
 	cat(" done.\n")
 
   # Cleanup
-  unlink(sprintf("%s/combined_res.log", outDir))
+  unlink(sprintf("%s/combined_res.log", output_folder))
 }

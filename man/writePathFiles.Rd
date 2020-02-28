@@ -5,8 +5,18 @@
 \title{Generates SNP lists per selection-enriched and unenriched pathway
 as determined by GSEA}
 \usage{
-writePathFiles(genoF, resF, gseaStatF, snp2geneF, famF, enrichNES = 3,
-  unenrichNES = 0.1, enrichDir, enrichEmDir, unenrichDir)
+writePathFiles(
+  genoF,
+  resF,
+  gseaStatF,
+  snp2geneF,
+  famF,
+  enrichNES = 3,
+  unenrichNES = 0.1,
+  enrichDir,
+  enrichEmDir,
+  unenrichDir
+)
 }
 \arguments{
 \item{genoF}{(char) path to file with SNP genotype data (PLINK format).}

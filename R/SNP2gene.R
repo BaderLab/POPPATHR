@@ -5,24 +5,24 @@
 #' Requires ignore.strand=TRUE param to properly run distanceToNearest()
 #' given unknown strand assignment for SNP array-based genotyping info
 #'
-#' @param inF (char) path to PLINK .bim file (only CHR, SNP, and BP
+#' @param in_file (char) path to PLINK .bim file (only CHR, SNP, and BP
 #' 		columns considered.
-#' @param geneF (char) path to refseq table with header.
+#' @param refgene_file (char) path to refseq table with header.
 #' @param marg (integer) region upstream and downstream of [txStart,txEnd].
-#' @param outF (char) path to write snp-to-gene mapping file.
+#' @param out_file (char) path to write snp-to-gene mapping file.
 #'
 #' @return none
 #' @export
 #'
 
-SNP2gene <- function(inF, geneF, marg=0L, outF) {
+SNP2gene <- function(in_file, refgene_file, marg=0L, out_file) {
 	cat("* Reading SNP table\n")
-	snps <- fread(inF, h=FALSE, data.table=FALSE) # fread much faster than read.table
+	snps <- fread(in_file, h=FALSE, data.table=FALSE) # fread much faster than read.table
 	snp_GR  <- GRanges(paste("chr", snps[,1], sep=""),
 					  				 IRanges(snps[,4], snps[,4]),
 					  			 	 name=snps[,2])
 
-	refGene <- read.delim(geneF, sep="\t", h=TRUE, as.is=TRUE)
+	refGene <- read.delim(refgene_file, sep="\t", h=TRUE, as.is=TRUE)
 	gene_GR	<- GRanges(refGene[,"chrom"],
 										 IRanges(refGene[,"txStart"] + 1 - marg,
 										 refGene[,"txEnd"] + marg),
@@ -56,7 +56,7 @@ SNP2gene <- function(inF, geneF, marg=0L, outF) {
 	d1	 <- distanceToNearest(snp2_GR, start_GR, ignore.strand=TRUE)
 	dbit <- d1@elementMetadata$distance
 	d_start <- cbind(d1@from, d1@to, dbit)
-	colnames(d_start)[1:2] <- c("queryHits","subjectHits")
+	colnames(d_start)[1:2] <- c("queryHits", "subjectHits")
 
 	cat("* Computing distance to domain ends\n")
 	d2	 <- distanceToNearest(snp2_GR, end_GR, ignore.strand=TRUE)
@@ -75,17 +75,14 @@ SNP2gene <- function(inF, geneF, marg=0L, outF) {
 	idx		<- which(d_both$dbit.x < d_both$dbit.y);
 	out2	<- cbind(snp2_GR$name[d_both$queryHits[idx]],
 					 			 start_GR$name[d_both$subjectHits.x[idx]],
-					 		 	 d_both$dbit.x[idx]
-					)
+					 		 	 d_both$dbit.x[idx])
 	idx		<- setdiff(1:nrow(d_both), idx)
 	out3	<- cbind(snp2_GR$name[d_both$queryHits[idx]],
 					 			 end_GR$name[d_both$subjectHits.y[idx]],
-					 		 	 d_both$dbit.y[idx]
-					)
-
+					 		 	 d_both$dbit.y[idx])
 	out <- rbind(out1, out2, out3)
 
-	cat("* Writing to output file\n")
+	cat(sprintf("* Writing output to file %s\n", out_file))
 	options(scipen=10)  # prevent conversion of numbers to sci notation
-	write.table(out, file=outF, sep="\t", col=FALSE, row=FALSE, quote=FALSE)
+	write.table(out, file=out_file, sep="\t", col=FALSE, row=FALSE, quote=FALSE)
 }

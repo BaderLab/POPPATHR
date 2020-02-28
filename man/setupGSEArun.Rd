@@ -5,31 +5,39 @@
 \title{Sets up and runs GSEA using population-based FST
 table containing GSEA results (Geneset, Size, ES, NES, NominalP, FDR, FWER)}
 \usage{
-setupGSEArun(realF, pathF, snp2geneF, setPerm = 1000L,
-  snp2genedist = 500000L, minGene = 10L, maxGene = 300L,
-  setSeed = 42L, outDir)
+setupGSEArun(
+  fst_file,
+  annotation_file,
+  snp2gene_file,
+  SET_PERM = SET_PERM,
+  SNP2GENE_DIST = SNP2GENE_DIST,
+  MIN_GENE = MIN_GENE,
+  MAX_GENE = MAX_GENE,
+  SET_SEED = 42,
+  output_folder
+)
 }
 \arguments{
-\item{realF}{(char) path to file with real SNP association statistics}
+\item{fst_file}{(char) path to file with SNP-level FST statistics}
 
-\item{pathF}{(char) path to pathway definitions GMT file}
+\item{annotation_file}{(char) path to pathway definitions GMT file}
 
-\item{snp2geneF}{(char) path to file with snp2gene mappings. Output of
+\item{snp2gene_file}{(char) path to file with snp2gene mappings. Output of
 mapSNP2gene() (found in GWAS2Pathway).}
 
-\item{setPerm}{(integer) set cycle of permutations to run
+\item{SET_PERM}{(integer) set cycle of permutations to run
 default=1000}
 
-\item{snp2genedist}{(integer) value for GSEA --distance.
-Max. distance between SNP and gene for their association in snp2geneF}
+\item{SNP2GENE_DIST}{(integer) value for GSEA --distance.
+Max. distance between SNP and gene for their association in snp2gene_file}
 
-\item{minGene}{(integer) value for GSEA --setmin.
+\item{MIN_GENE}{(integer) value for GSEA --setmin.
 Min. number of genes in a gene set to be considered}
 
-\item{maxGene}{(integer) value for GSEA --setmax.
+\item{MAX_GENE}{(integer) value for GSEA --setmax.
 Max. number of genes in a gene set to be considered}
 
-\item{setSeed}{(integer) value for GSEA --seed}
+\item{SET_SEED}{(integer) value for GSEA --seed}
 }
 \value{
 none

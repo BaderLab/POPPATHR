@@ -1,38 +1,39 @@
 #' Calculate population stratification between different
 #' ancestry groups (e.g., CEU vs YRI) via complete linkage clustering
 #'
-#' @param genoF (char) path to file with SNP genotype data (PLINK format).
-#' @param famF (char) path to PLINK fam file (case/control population coded).
-#' @param pop1 (char) character code for the first population (controls).
-#' @param pop2 (char) character code for the second population (cases).
-#' @param dimensions (integer, default=3).
-#' @param outF (char) path to write PNG image.
+#' @param genotype_file (char) path to file with SNP genotype data (PLINK format).
+#' @param fam_file (char) path to population-coded PLINK fam file.
+#' @param pop_one (char) character code for the first population.
+#' @param pop_two (char) character code for the second population.
+#' @param dimensions (integer) dimensions for which to calculate PCA sim default=3).
+#' @param out_file (char) path to write PNG image.
 #'
 #' @return none
 #' @export
 #'
 
-popPCA <- function(genoF, famF, pop1, pop2, dimensions=3L, outF) {
+popPCA <- function(genotype_file, fam_file, pop_one, pop_two,
+                   dimensions=3, out_file) {
   # Calculate PCA via PLINK
-  str1 <- sprintf("PLINK --bed %s.bed --bim %s.bim --fam %s", genoF, genoF, famF)
-  str2 <- sprintf("--cluster --mds-plot %i --allow-no-sex --out %s", dimensions, outF)
+  str1 <- sprintf("PLINK --bed %s.bed --bim %s.bim --fam %s", genotype_file, genotype_file, fam_file)
+  str2 <- sprintf("--cluster --mds-plot %i --allow-no-sex --out %s", dimensions, out_file)
   cmd <- paste(str1, str2)
   system(cmd)
 
   # Plot PCA
   ## Read in MDS (multidimensional scaling) table
-  mds <- read.table(sprintf("%s.mds", outF), h=TRUE, as.is=TRUE)
+  mds <- read.table(sprintf("%s.mds", out_file), h=TRUE, as.is=TRUE)
 
   ## Read in subject information pertaining to the different ancestry groups
   ## (NOTE: PLINK .fam file)
-  pops <- read.table(famF, h=FALSE, as.is=TRUE)
+  pops <- read.table(fam_file, h=FALSE, as.is=TRUE)
   pops.ctrls <- filter(pops, V6 == 1)
   pops.cases <- filter(pops, V6 == 2)
 
   ## Identify MDS components per ancestry groups for cluster grouping
   for (i in 1:nrow(mds)) {
-    if (mds$IID[i] %in% pops.ctrls[,2]) mds[i, "population"] <- pop1
-    else if (mds$IID[i] %in% pops.cases[,2]) mds[i, "population"] <- pop2
+    if (mds$IID[i] %in% pops.ctrls[,2]) mds[i, "population"] <- pop_one
+    else if (mds$IID[i] %in% pops.cases[,2]) mds[i, "population"] <- pop_two
     else mds[i, "population"] <- "Other populations"
   }
   mds$population <- as.factor(mds$population)
@@ -45,5 +46,5 @@ popPCA <- function(genoF, famF, pop1, pop2, dimensions=3L, outF) {
       #ylim(-0.10, 0.15) +
       scale_color_brewer(palette="Dark2") +
       theme_classic()
-  ggsave(sprintf("%s.png", outF), width=5, height=5)
+  ggsave(sprintf("%s.png", out_file), width=5, height=5)
 }

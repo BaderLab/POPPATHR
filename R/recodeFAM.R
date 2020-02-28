@@ -1,60 +1,57 @@
-#' Recodes PLINK fam file to case/control format by population
+#' Recodes PLINK fam file with population-specific codes
 #' adapted from SP plink_baseSetup.R (part of GWAS2pathway package)
 #'
-#' @param genoF (char) path to file with SNP genotype data (PLINK format)
-#' @param pop1 (char) character code for the first population (controls).
-#' @param pop2 (char) character code for the second population (cases).
-#' @param popsF (char) path to file with population information.
+#' @param genotype_file (char) path to file with SNP genotype data (PLINK format)
+#' @param pop_one (char) character code for the first population.
+#' @param pop_two (char) character code for the second population.
+#' @param population_table (char) path to file with population information.
 #'		Gives the number of samples per population in the dataset.
-#' @param caseCode (integer) value for case samples in fam phenotype column.
-#' @param ctrlCode (integer) value for control samples in fam phenotype column.
-#' @param outF (char) optional - name for fam file (default=case-ctrl).
+#' @param SET_SEED (integer) value for set.seed() before shuffling (default=42).
+#' @param out_file (char) optional; name for fam file (default=population-coded).
 #'   file extension added.
-#' @param setSeed (integer) value for set.seed() before shuffling (default=42).
 #'
 #' @return none
 #' @export
 #'
 
-recodeFAM <- function(genoF, pop1, pop2, popsF,
-											setSeed=42L, caseCode=2, ctrlCode=1,
-											outF="case-ctrl") {
+recodeFAM <- function(genotype_file, pop_one, pop_two, population_table,
+											SET_SEED=42, out_file="population-coded") {
 	# Keep IDs corresponding to population codes
-	pops      <- read.table(popsF, as.is=TRUE, h=TRUE)
-	ctrlNames <- pops[,2][pops[,7] == pop1]
-	caseNames <- pops[,2][pops[,7] == pop2]
+	pops <- read.table(population_table, as.is=TRUE, h=TRUE)
+	pop_one_names <- pops[,2][pops[,7] == pop_one]
+	pop_two_names <- pops[,2][pops[,7] == pop_two]
 
-	fam_tab <- read.table(sprintf("%s.fam", genoF), h=FALSE)
+	fam_tab <- read.table(sprintf("%s.fam", genotype_file), h=FALSE)
 
 	# Write out new fam file w/ case-control coding
-	cat("*Rewriting .fam file with case/control coding...\n")
-	cat(sprintf("  In population file: %i cases (%s), %i controls (%s)\n",
-		length(caseNames), pop2, length(ctrlNames), pop1))
+	cat("* Rewriting fam file with population coding...\n")
+	cat(sprintf("		In population table: %i cases (%s), %i controls (%s)\n",
+		length(pop_two_names), pop_two, length(pop_one_names), pop_one))
 
-	fam_tab[fam_tab$V2 %in% caseNames, 'V6'] <- caseCode
-	fam_tab[fam_tab$V2 %in% ctrlNames, 'V6'] <- ctrlCode
+	fam_tab[fam_tab$V2 %in% pop_one_names, 'V6'] <- 1
+	fam_tab[fam_tab$V2 %in% pop_two_names, 'V6'] <- 2
 
-	# Stop code from continuing if 'pop1/2' individuals from population file
+	# Stop code from continuing if 'pop_one/2' individuals from population file
 	# are not found in the respective pheno (.fam) file.
 	# e.g., GWD (Gambian) individuals are indicated in the 1KG population
 	# description file but are not found in the pheno file. This prevents the
 	# code from continuing without having any cases / controls.
 	if (sum(fam_tab$V6 == 2) == 0)
 		 stop(sprintf(paste("No '%s' individuals found in PLINK phenotype file.",
-		 										"Correct spelling or try another population."), pop2))
+		 										"Correct spelling or try another population."), pop_two))
 
 	if (sum(fam_tab$V6 == 1) == 0)
  		 stop(sprintf(paste("No '%s' individuals found in PLINK phenotype file.",
-		 										"Correct spelling or try another population."), pop1))
+		 										"Correct spelling or try another population."), pop_one))
 
-	famDir <- dirname(genoF)
-  famOut <- sprintf("%s/%s.fam", famDir, outF)
-  write.table(fam_tab, file=famOut, row=F, quote=F, col=F)
+	fam_folder <- dirname(genotype_file)
+  fam_out <- sprintf("%s/%s.fam", fam_folder, out_file)
+  write.table(fam_tab, file=fam_out, row=FALSE, quote=FALSE, col=FALSE)
 
 	caseNum <- which(fam_tab$V6 == 2)
 	ctrlNum <- which(fam_tab$V6 == 1)
 
-	cat(sprintf("  In phenotype fam file: %i cases (%s), %i controls (%s)\n",
-		length(caseNum), pop2, length(ctrlNum), pop1))
-	cat(sprintf("*File written to %s.\n", famOut))
+	cat(sprintf("		In population-coded fam file: %i cases (%s), %i controls (%s)\n",
+		length(caseNum), pop_two, length(ctrlNum), pop_one))
+	cat(sprintf("* New population-coded file written to %s.\n", fam_out))
 }
