@@ -1,5 +1,6 @@
 annotations/
 genotypes/
 software/
+example/
 output/
 *.DS_Store
