@@ -59,14 +59,7 @@ setupGSEArun <- function(fst_file, annotation_file, snp2gene_file,
 	cat(" done.\n")
 
 	# Write output to excel format
-	#write.xlsx(dat,file=sprintf("%s/results.xlsx", output_folder), col=TRUE, row=FALSE)
-
-	# Write table of significant pathways to output directory
-	write.table(dat[sigPaths1,], file=sprintf("%s/pathways_FDR0.1.txt", output_folder),
-		sep="\t", col=TRUE, row=FALSE, quote=FALSE)
-	write.table(dat[sigPaths2,], file=sprintf("%s/pathways_FDR0.05.txt", output_folder),
-		sep="\t", col=TRUE, row=FALSE, quote=FALSE)
-	cat(" done.\n")
+	#write.xlsx(dat, file=sprintf("%s/results.xlsx", output_folder), col=TRUE, row=FALSE)
 
   # Cleanup
   unlink(sprintf("%s/combined_res.log", output_folder))

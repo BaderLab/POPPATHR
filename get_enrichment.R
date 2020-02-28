@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------#
 # POPPATHR: Population-based pathway analysis of SNP-SNP coevolution
 # Special thanks to Shraddha Pai
-# Last modified 16 October 2019
+# Last modified 28 February 2020
 #------------------------------------------------------------------------------#
 
 # Loads all packages in a way that allows exporting to child environments
@@ -25,10 +25,8 @@ for (file in Rfun) { source(file) }
 parser <- ArgumentParser(description=" POPPATHR: Population-based pathway analysis of SNP-SNP coevolution.")
 parser$add_argument("-v", "--verbose", action="store_true", default=TRUE,
                     help="Print verbose output [default TRUE]")
-parser$add_argument("-p1", "--population_one", type="character", default="CEU",
-                    help="Population name of first population cohort to test [default %(default)s]")
-parser$add_argument("-p2", "--population_two", type="character", default="YRI",
-                    help="Population name of second population cohort to test [default %(default)s]")
+parser$add_argument("-p", "--population_pair", type="character", default="CEU_YRI",
+                    help="Names of two population cohorts to test [default %(default)s]")
 parser$add_argument("-g", "--genotype_file", type="character", default="genotypes/HM3_2010_05_phase3",
                     help="Path to PLINK (bed, bim, fam formatted) SNP genotype files [default %(default)s]")
 parser$add_argument("-t", "--population_table", type="character", default="genotypes/relationships_w_pops_041510.txt",
@@ -47,18 +45,14 @@ parser$add_argument("--MAX_GENE", type="integer", default=300,
                     help="Maximum number of genes permitted in pathway gene set [default %(default)s]")
 parser$add_argument("--SNP2GENE_DIST", type="integer", default=500000,
                     help="Maximum distance (bp) considered for SNP-to-gene mapping [default %(default)s]")
-parser$add_argument("--ENRICH_NES", type="integer", default=3,
-                    help="NES threshold to define enriched pathway gene sets [default %(default)s]")
-parser$add_argument("--UNENRICH_NES", type="integer", default=0.1,
-                    help="NES threshold to define unenriched control pathway gene sets [default %(default)s]")
 args <- parser$parse_args()
 
 ######
 # PARAMETER SETTING
 ######
 
-pop_one <- args$population_one
-pop_two <- args$population_two
+# Sets important parameters
+pop_pair <- args$population_pair
 genotype_file <- args$genotype_file
 population_table <- args$population_table
 annotation_file <- args$annotation_file
@@ -68,21 +62,33 @@ SET_PERM <- args$SET_PERM
 MIN_GENE <- args$MIN_GENE
 MAX_GENE <- args$MAX_GENE
 SNP2GENE_DIST <- args$SNP2GENE_DIST
-ENRICH_NES <- args$ENRICH_NES
-UNENRICH_NES <- args$UNENRICH_NES
+
+# Define I/O file names based on user input information
+pop_one <- unlist(lapply(strsplit(pop_pair, "_"), "[", 1))
+pop_two <- unlist(lapply(strsplit(pop_pair, "_"), "[", 2))
+snp_file <- sprintf("%s.bim", genotype_file)
+fam_name <- sprintf("%s_%s", basename(genotype_file), pop_pair)
+fam_file <- sprintf("%s_%s.fam", genotype_file, pop_pair)
+pca_file <- sprintf("%s/%s", pca_folder, fam_name)
+fst_file <- sprintf("%s/markerFST.txt", fst_folder)
+snp2gene_file <- sprintf("%s/snp2gene.txt", gsea_folder)
 
 # Checks if files exist
-snp_file <- sprintf("%s.bim", genotype_file)
-
 if (!file.exists(snp_file)) {
-  stop("ERROR: PLINK-formatted SNP genotype file does not exist!")
+  stop("PLINK-formatted SNP genotype file does not exist!")
+}
+if (is.na(pop_one)) {
+  stop("Is --population_pair (-p) argument in '[POPULATION_NAME]_[POPULATION_NAME] format?")
+}
+if (is.na(pop_two)) {
+  stop("Is --population_pair (-p) argument in '[POPULATION_NAME]_[POPULATION_NAME] format?")
 }
 
 # Generate parent output folder if it doesn't already exist
 if (!dir.exists(output_folder)) { dir.create(output_folder) }
 
 # Generate population-specific subfolders
-pop_folder <- sprintf("%s/%s_%s", output_folder, pop_one, pop_two)
+pop_folder <- sprintf("%s/%s", output_folder, pop_pair)
 if (!dir.exists(pop_folder)) { dir.create(pop_folder) }
 pca_folder <- sprintf("%s/pca", pop_folder)
 if (!file.exists(pca_folder)) dir.create(pca_folder)
@@ -110,20 +116,10 @@ cat(sprintf(
   \tGenotyping dataset: %s
   \tPathway size limit: %s - %s genes
   \tSNP-gene mapping threshold: %skb
-  \tPermutation cycles: %s
-  \tEnriched gene-set NES threshold: %s
-  \tUnenriched control gene-set NES threshold: %s\n",
+  \tPermutation cycles: %s\n",
   pop_one, pop_two, pop_folder, genotype_file, MIN_GENE, MAX_GENE,
-  SNP2GENE_DIST/1000, SET_PERM, ENRICH_NES, UNENRICH_NES
+  SNP2GENE_DIST/1000, SET_PERM
 ))
-Sys.sleep(3)
-
-# Define I/O file names based on user input information
-fam_name <- sprintf("%s_%s_%s", basename(genotype_file), pop_one, pop_two)
-fam_file <- sprintf("%s_%s_%s.fam", genotype_file, pop_one, pop_two)
-pca_file <- sprintf("%s/%s", pca_folder, fam_name)
-fst_file <- sprintf("%s/markerFST.txt", fst_folder)
-snp2gene_file <- sprintf("%s/snp2gene.txt", gsea_folder)
 
 ######
 # RECODE PLINK FAM FILE
@@ -194,3 +190,6 @@ setupGSEArun(
   output_folder=gsea_folder
 )
 Sys.sleep(3)
+
+# End sinking
+#sink()
