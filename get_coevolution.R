@@ -65,11 +65,9 @@ fam_file <- sprintf("%s_%s_%s.fam", genotype_file, pop_one, pop_two)
 
 if (length(pop_pair_two)) {
   pop_pairs <- paste(c(pop_pair_one, pop_pair_two), collapse="|")
-} else {
-  pop_pairs <- pop_pair_one
 }
 
-# Folders for two population comparisons, if specified
+# Folders for two population comparisons to validate GSEA results, if specified
 results_folders <- list.files(pattern=pop_pairs, path=output_folder, full.names=TRUE)
 gsea_folders <- list.files(pattern="gsea", path=results_folders, full.names=TRUE)
 results_file <- list.files(pattern="results", path=gsea_folders, full.names=TRUE)
@@ -153,6 +151,7 @@ writePathFiles(
 message("\n** CALCULATING TRANS-CHROMOSOMAL SNP-SNP CORRELATION **\n")
 
 ## WPM (within-pathway model)
+message("\n** WITHIN-PATHWAY **\n")
 SNPassocWPM(
   enrich_folder=enrich_folder,
   unenrich_folder=unenrich_folder,
@@ -162,6 +161,7 @@ SNPassocWPM(
 )
 
 ## BPM (between-pathway model)
+message("\n** BETWEEN-PATHWAY **\n")
 SNPassocBPM(
   enrich_folder=enrichEM_folder,
   unenrich_folder=unenrich_folder,

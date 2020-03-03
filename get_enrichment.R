@@ -69,9 +69,6 @@ pop_two <- unlist(lapply(strsplit(pop_pair, "_"), "[", 2))
 snp_file <- sprintf("%s.bim", genotype_file)
 fam_name <- sprintf("%s_%s", basename(genotype_file), pop_pair)
 fam_file <- sprintf("%s_%s.fam", genotype_file, pop_pair)
-pca_file <- sprintf("%s/%s", pca_folder, fam_name)
-fst_file <- sprintf("%s/markerFST.txt", fst_folder)
-snp2gene_file <- sprintf("%s/snp2gene.txt", gsea_folder)
 
 # Checks if files exist
 if (!file.exists(snp_file)) {
@@ -84,10 +81,10 @@ if (is.na(pop_two)) {
   stop("Is --population_pair (-p) argument in '[POPULATION_NAME]_[POPULATION_NAME] format?")
 }
 
-# Generate parent output folder if it doesn't already exist
+# Create parent output folder if it doesn't already exist
 if (!dir.exists(output_folder)) { dir.create(output_folder) }
 
-# Generate population-specific subfolders
+# Create analysis-specific subfolders
 pop_folder <- sprintf("%s/%s", output_folder, pop_pair)
 if (!dir.exists(pop_folder)) { dir.create(pop_folder) }
 pca_folder <- sprintf("%s/pca", pop_folder)
@@ -96,6 +93,11 @@ fst_folder <- sprintf("%s/fst", pop_folder)
 if (!file.exists(fst_folder)) dir.create(fst_folder)
 gsea_folder <- sprintf("%s/gsea", pop_folder)
 if (!file.exists(gsea_folder)) dir.create(gsea_folder)
+
+# Pre-define downstream files
+pca_file <- sprintf("%s/%s", pca_folder, fam_name)
+fst_file <- sprintf("%s/markerFST.txt", fst_folder)
+snp2gene_file <- sprintf("%s/snp2gene.txt", gsea_folder)
 
 #------------------------------------------------------------------------------#
 # IDENTIFY SELECTION-ENRICHED PATHWAY GENE SETS
