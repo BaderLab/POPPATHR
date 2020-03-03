@@ -8,7 +8,7 @@
 
 # Loads all packages in a way that allows exporting to child environments
 packages <- c("tidyverse", "data.table", "reshape2", "gdata", "RColorBrewer",
-              "gridExtra", "cowplot", "GenomicRanges", "snpStats", "RCy3", "argparse")
+              "GenomicRanges", "argparse")
 for (p in packages) {
   suppressPackageStartupMessages(library(p, character.only = TRUE))
 }
@@ -75,10 +75,10 @@ if (!file.exists(snp_file)) {
   stop("PLINK-formatted SNP genotype file does not exist!")
 }
 if (is.na(pop_one)) {
-  stop("Is --population_pair (-p) argument in '[POPULATION_NAME]_[POPULATION_NAME] format?")
+  stop("Is --population_pair (-p) argument in '[POPULATION_NAME]_[POPULATION_NAME]' format?")
 }
 if (is.na(pop_two)) {
-  stop("Is --population_pair (-p) argument in '[POPULATION_NAME]_[POPULATION_NAME] format?")
+  stop("Is --population_pair (-p) argument in '[POPULATION_NAME]_[POPULATION_NAME]' format?")
 }
 
 # Create parent output folder if it doesn't already exist

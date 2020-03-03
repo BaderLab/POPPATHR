@@ -8,7 +8,7 @@
 
 # Loads all packages in a way that allows exporting to child environments
 packages <- c("tidyverse", "data.table", "reshape2", "gdata", "RColorBrewer",
-              "gridExtra", "cowplot", "GenomicRanges", "snpStats", "RCy3", "argparse")
+              "snpStats", "RCy3", "argparse")
 for (p in packages) {
   suppressPackageStartupMessages(library(p, character.only = TRUE))
 }
