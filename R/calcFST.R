@@ -19,8 +19,7 @@ calcFST <- function(genotype_file, fam_file, output_folder, out_file) {
   system(cmd)
 
   # Read in generated plink.fst file
-  fst_cc  <- fread(sprintf("%s/%s.fst", output_folder, basename(genotype_file)),
-		h=TRUE, data.table=FALSE)
+  fst_cc  <- fread(sprintf("%s/%s.fst", output_folder, basename(genotype_file)), h=TRUE, data.table=FALSE)
   fst_input <- subset(fst_cc, select=c(SNP, FST))
   fst_input[is.na(fst_input)] <- 0
 
@@ -28,6 +27,5 @@ calcFST <- function(genotype_file, fam_file, output_folder, out_file) {
   # calculate_gsea.pl. This script explicitly accepts two header labels,
   # 'P' or 'CHI2' typically from GWAS. The column still contains SNP FST values.
   cat(sprintf("* Writing out FST file to %s.\n", out_file))
-  write.table(fst_input, file=out_file,
-		col.names=c("Marker", "CHI2"), row=FALSE, sep="\t", quote=FALSE)
+  write.table(fst_input, file=out_file, col.names=c("Marker", "CHI2"), row=FALSE, sep="\t", quote=FALSE)
 }

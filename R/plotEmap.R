@@ -19,8 +19,7 @@
 #' @export
 #'
 
-plotEmap <- function(gmtF, eMapF, outDir,
-									   netName="generic", imageFormat="png") {
+plotEmap <- function(gmtF, eMapF, outDir, netName="generic", imageFormat="png") {
 
 	# Confirm that Cytoscape is installed and opened
 	#cytoscapeVersionInfo()

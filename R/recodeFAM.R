@@ -25,17 +25,16 @@ recodeFAM <- function(genotype_file, pop_one, pop_two, population_table,
 
 	# Write out new fam file w/ case-control coding
 	cat("* Rewriting fam file with population coding...\n")
-	cat(sprintf("		In population table: %i cases (%s), %i controls (%s)\n",
+	cat(sprintf("	In population table: %i cases (%s), %i controls (%s)\n",
 		length(pop_two_names), pop_two, length(pop_one_names), pop_one))
 
 	fam_tab[fam_tab$V2 %in% pop_one_names, 'V6'] <- 1
 	fam_tab[fam_tab$V2 %in% pop_two_names, 'V6'] <- 2
 
-	# Stop code from continuing if 'pop_one/2' individuals from population file
-	# are not found in the respective pheno (.fam) file.
+	# Stop code from continuing if pop_one/pop_two individuals from population file
+	# are not found in the respective phenotype (.fam) file.
 	# e.g., GWD (Gambian) individuals are indicated in the 1KG population
-	# description file but are not found in the pheno file. This prevents the
-	# code from continuing without having any cases / controls.
+	# description file but are not found in the phenotype file.
 	if (sum(fam_tab$V6 == 2) == 0)
 		 stop(sprintf(paste("No '%s' individuals found in PLINK phenotype file.",
 		 										"Correct spelling or try another population."), pop_two))
@@ -51,7 +50,7 @@ recodeFAM <- function(genotype_file, pop_one, pop_two, population_table,
 	caseNum <- which(fam_tab$V6 == 2)
 	ctrlNum <- which(fam_tab$V6 == 1)
 
-	cat(sprintf("		In population-coded fam file: %i cases (%s), %i controls (%s)\n",
+	cat(sprintf("	In population-coded fam file: %i cases (%s), %i controls (%s)\n",
 		length(caseNum), pop_two, length(ctrlNum), pop_one))
 	cat(sprintf("* New population-coded file written to %s.\n", fam_out))
 }
