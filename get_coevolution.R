@@ -119,11 +119,7 @@ if (!file.exists(bpm_folder)) dir.create(bpm_folder)
 
 # Pre-define downstream files
 EM_group_file <- sprintf("%s/EM_group_list.rda", enrichEM_folder)
-
-# NOTE Cytoscape requires absolute paths of input files
 EM_file <- sprintf("%s/results_EM.txt", gsea_folder)
-EM_file <- normalizePath(EM_file)
-annotation_file <- normalizePath(annotation_file)
 
 #------------------------------------------------------------------------------#
 # MESURE SNP-SNP COEVOLUTION WITHIN AND BETWEEN SELECTION-ENRICHED PATHWAYS
@@ -139,6 +135,11 @@ writeEmapFile(
   ENRICH_NES=ENRICH_NES,
   out_file=EM_file
 )
+
+# NOTE Cytoscape requires absolute paths of input files
+EM_file <- normalizePath(EM_file)
+annotation_file <- normalizePath(annotation_file)
+
 plotEmap(
   gmt_file=annotation_file,
   EM_file=EM_file,
