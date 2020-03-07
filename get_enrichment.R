@@ -27,13 +27,13 @@ parser$add_argument("-v", "--verbose", action="store_true", default=TRUE,
                     help="Print verbose output [default TRUE]")
 parser$add_argument("-p", "--population_pair", type="character", default="CEU_YRI",
                     help="Names of two population cohorts to test [default %(default)s]")
-parser$add_argument("-g", "--genotype_file", type="character", default="genotypes/HM3_2010_05_phase3",
+parser$add_argument("-g", "--genotype_file", type="character", default="data/genotypes/HM3_2010_05_phase3",
                     help="Path to PLINK (bed, bim, fam formatted) SNP genotype files [default %(default)s]")
-parser$add_argument("-t", "--population_table", type="character", default="genotypes/relationships_w_pops_041510.txt",
+parser$add_argument("-t", "--population_table", type="character", default="data/genotypes/relationships_w_pops_041510.txt",
                     help="Path to table defining population genotypes [default %(default)s]")
-parser$add_argument("-a", "--annotation_file", type="character", default="annotations/Human_GOBP_AllPathways_no_GO_iea_April_24_2016_symbol.gmt",
+parser$add_argument("-a", "--annotation_file", type="character", default="data/annotations/Human_GOBP_AllPathways_no_GO_iea_April_24_2016_symbol.gmt",
                     help="Path to gmt file containing pathway annotations [default %(default)s]")
-parser$add_argument("-r", "--refgene_file", type="character", default="annotations/refGene.hg19.header.txt",
+parser$add_argument("-r", "--refgene_file", type="character", default="data/annotations/refGene.hg19.header.txt",
                     help="Path to refGene genome annotation file [default %(default)s]")
 parser$add_argument("-o", "--output_folder", type="character", default="output",
                     help="Path to output folder [default %(default)s]")

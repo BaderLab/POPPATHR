@@ -291,7 +291,7 @@ SNPassocBPM <- function(pop_one, pop_two, snp2gene_file, ASSOC_FDR,
     cat(sprintf("** Table of pathway p-values written to %s.\n", filename_1))
   }
   # Run for both populations
-  mapply(calcCoev, c(pop_one, pop_two))
+  invisible(mapply(calcCoev, c(pop_one, pop_two)))
 
   # Merge both p value dataframes
   pval_merge <- join(res[[1]], res[[2]], by=c("interaction.pathway_pair1", "interaction.pathway_pair2"))

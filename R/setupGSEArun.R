@@ -14,6 +14,7 @@
 #' @param MAX_GENE (integer) value for GSEA --setmax.
 #' 		Max. number of genes in a gene set to be considered
 #' @param SET_SEED (integer) value for GSEA --seed
+#' @param output_folder (char) path to store output files.
 #'
 #' @return none
 #' @export

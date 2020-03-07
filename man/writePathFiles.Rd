@@ -6,44 +6,48 @@
 as determined by GSEA}
 \usage{
 writePathFiles(
-  genoF,
-  resF,
-  gseaStatF,
-  snp2geneF,
-  famF,
-  enrichNES = 3,
-  unenrichNES = 0.1,
-  enrichDir,
-  enrichEmDir,
-  unenrichDir
+  genotype_file,
+  results_file,
+  gseaStat_file,
+  snp2gene_file,
+  fam_file,
+  EM_group_file,
+  ENRICH_NES,
+  UNENRICH_NES,
+  enrich_folder,
+  enrichEM_folder,
+  unenrich_folder
 )
 }
 \arguments{
-\item{genoF}{(char) path to file with SNP genotype data (PLINK format).}
+\item{genotype_file}{(char) path to file with SNP genotype data (PLINK format).}
 
-\item{resF}{(char) path to files with GSEA results.
+\item{results_file}{(char) path to files with GSEA results.
 Strutured to compare results of two population analyses
 i.e., CEU vs. YRI and CEU vs. LWK.}
 
-\item{gseaStatF}{(char) path to GSEA statistics file.}
+\item{gseaStat_file}{(char) path to GSEA statistics file.}
 
-\item{snp2geneF}{(char) path to SNP-gene mapping file.}
+\item{snp2gene_file}{(char) path to SNP-gene mapping file.}
 
-\item{famF}{(char) path to PLINK population coded fam file.}
+\item{fam_file}{(char) path to PLINK population coded fam file.}
 
-\item{enrichNES}{(integer) NES cutoff to select validated selection-enriched
+\item{EM_group_file}{(char) file path to write pathway groupings as determined
+by EnrichmentMap.}
+
+\item{ENRICH_NES}{(integer) NES cutoff to select validated selection-enriched
 pathways (default=3)}
 
-\item{unenrichNES}{(integer) NES cutoff to select unenriched pathways
+\item{UNENRICH_NES}{(integer) NES cutoff to select unenriched pathways
 (default=0.1)}
 
-\item{enrichDir}{(char) path to directory to store output files
+\item{enrich_folder}{(char) path to directory to store output files
 (PLINK files per selection-enriched gene set)}
 
-\item{enrichEmDir}{(char) path to directory to store output files
+\item{enrichEM_folder}{(char) path to directory to store output files
 (PLINK files per selection-enriched pathway, grouped via AutoAnnotate)}
 
-\item{unenrichDir}{(char) path to directory to store output files
+\item{unenrich_folder}{(char) path to directory to store output files
 (PLINK files per unenriched gene set)}
 }
 \value{

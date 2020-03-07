@@ -38,6 +38,8 @@ Min. number of genes in a gene set to be considered}
 Max. number of genes in a gene set to be considered}
 
 \item{SET_SEED}{(integer) value for GSEA --seed}
+
+\item{output_folder}{(char) path to store output files.}
 }
 \value{
 none

@@ -29,9 +29,9 @@ parser$add_argument("-p1", "--population_pair_one", type="character", default="C
                     help="Names of first population pair tested [default %(default)s]")
 parser$add_argument("-p2", "--population_pair_two", type="character", default=NULL,
                     help="Name of second population pair tested; optional [default %(default)s]")
-parser$add_argument("-g", "--genotype_file", type="character", default="genotypes/HM3_2010_05_phase3",
+parser$add_argument("-g", "--genotype_file", type="character", default="data/genotypes/HM3_2010_05_phase3",
                     help="Path to PLINK (bed, bim, fam formatted) SNP genotype files [default %(default)s]")
-parser$add_argument("-a", "--annotation_file", type="character", default="annotations/Human_GOBP_AllPathways_no_GO_iea_April_24_2016_symbol.gmt",
+parser$add_argument("-a", "--annotation_file", type="character", default="data/annotations/Human_GOBP_AllPathways_no_GO_iea_April_24_2016_symbol.gmt",
                     help="Path to gmt file containing pathway annotations [default %(default)s]")
 parser$add_argument("-o", "--output_folder", type="character", default="output",
                     help="Path to output folder [default %(default)s]")

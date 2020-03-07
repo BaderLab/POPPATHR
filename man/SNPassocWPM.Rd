@@ -5,18 +5,27 @@
 \title{Calculate selection statistics (LD) and perform exploratory analyses
 for two sets of variants via R snpStats package}
 \usage{
-SNPassocWPM(enrichDir, unenrichDir, pop1, pop2, outDir)
+SNPassocWPM(
+  pop_one,
+  pop_two,
+  ASSOC_FDR,
+  enrich_folder,
+  unenrich_folder,
+  output_folder
+)
 }
 \arguments{
-\item{enrichDir}{(char) path to selection-enriched pathway SNP lists}
+\item{pop_one}{(char) character code for the first population.}
 
-\item{unenrichDir}{(char) path to unenriched pathway SNP lists}
+\item{pop_two}{(char) character code for the second population.}
 
-\item{pop1}{(char) character code for the first population (controls).}
+\item{ASSOC_FDR}{(interger) FDR value to define significant pathway coevolution.}
 
-\item{pop2}{(char) character code for the second population (cases).}
+\item{enrich_folder}{(char) path to selection-enriched pathway SNP lists}
 
-\item{outDir}{(char) path to output directory}
+\item{unenrich_folder}{(char) path to unenriched pathway SNP lists}
+
+\item{output_folder}{(char) path to output directory}
 }
 \value{
 none
