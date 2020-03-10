@@ -118,6 +118,14 @@ SNPassocWPM <- function(pop_one, pop_two, ASSOC_FDR,
   #   return( n*(n-1)/2 ) }
 
   # Calculate trans-chromosomal SNP association within enriched pathways
+  results_list <- list()
+  for (pathway in c("enriched", "unenriched")) {
+    for (pop in c(pop_one, pop_two)) {
+      fname <- paste(pathway_set, population_cohort, sep="_")
+      results_list[[fname]] <- calcAssoc(pathway, pop)
+    }
+  }
+
   enrich_pop_one <- calcAssoc("enriched", pop_one)
   enrich_pop_two <- calcAssoc("enriched", pop_two)
   unenrich_pop_one <- calcAssoc("unenriched", pop_one)
