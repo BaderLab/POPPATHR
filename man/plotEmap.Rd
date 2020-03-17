@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotEmap.R
 \name{plotEmap}
 \alias{plotEmap}
-\title{Create EnrichmentMap in Cytoscape to visualize selection-enriched pathways}
+\title{Plots an EnrichmentMap in Cytoscape to visualize selection-enriched pathways}
 \usage{
 plotEmap(
   gmt_file,

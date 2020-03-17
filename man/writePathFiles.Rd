@@ -12,8 +12,8 @@ writePathFiles(
   snp2gene_file,
   fam_file,
   EM_group_file,
-  ENRICH_NES,
-  UNENRICH_NES,
+  ENRICH_NES = 3,
+  UNENRICH_NES = 0.1,
   enrich_folder,
   enrichEM_folder,
   unenrich_folder
@@ -36,19 +36,19 @@ i.e., CEU vs. YRI and CEU vs. LWK.}
 by EnrichmentMap.}
 
 \item{ENRICH_NES}{(integer) NES cutoff to select validated selection-enriched
-pathways (default=3)}
+pathways (default=3).}
 
 \item{UNENRICH_NES}{(integer) NES cutoff to select unenriched pathways
-(default=0.1)}
+(default=0.1).}
 
 \item{enrich_folder}{(char) path to directory to store output files
-(PLINK files per selection-enriched gene set)}
+(PLINK files per selection-enriched gene set).}
 
 \item{enrichEM_folder}{(char) path to directory to store output files
-(PLINK files per selection-enriched pathway, grouped via AutoAnnotate)}
+(PLINK files per selection-enriched pathway, grouped via AutoAnnotate).}
 
 \item{unenrich_folder}{(char) path to directory to store output files
-(PLINK files per unenriched gene set)}
+(PLINK files per unenriched gene set).}
 }
 \value{
 none

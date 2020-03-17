@@ -2,24 +2,25 @@
 % Please edit documentation in R/SNPassocWPM.R
 \name{SNPassocWPM}
 \alias{SNPassocWPM}
-\title{Calculate selection statistics (LD) and perform exploratory analyses
-for two sets of variants via R snpStats package}
+\title{Calculates SNP-SNP association statistics and perform exploratory analyses
+within pathways}
 \usage{
 SNPassocWPM(
   pop_one,
   pop_two,
-  ASSOC_FDR,
+  ASSOC_FDR = 0.05,
   enrich_folder,
   unenrich_folder,
   output_folder
 )
 }
 \arguments{
-\item{pop_one}{(char) character code for the first population.}
+\item{pop_one}{(char) character code for the first population (e.g., CEU).}
 
-\item{pop_two}{(char) character code for the second population.}
+\item{pop_two}{(char) character code for the second population (e.g., YRI).}
 
-\item{ASSOC_FDR}{(interger) FDR value to define significant pathway coevolution.}
+\item{ASSOC_FDR}{(interger) FDR value to define significant pathway coevolution
+(default=0.05).}
 
 \item{enrich_folder}{(char) path to selection-enriched pathway SNP lists}
 
@@ -31,6 +32,6 @@ SNPassocWPM(
 none
 }
 \description{
-Calculate selection statistics (LD) and perform exploratory analyses
-for two sets of variants via R snpStats package
+Calculates SNP-SNP association statistics and perform exploratory analyses
+within pathways
 }

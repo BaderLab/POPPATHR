@@ -11,15 +11,15 @@
 #' @param EM_group_file (char) file path to write pathway groupings as determined
 #' 		by EnrichmentMap.
 #' @param ENRICH_NES (integer) NES cutoff to select validated selection-enriched
-#'		pathways (default=3)
+#'		pathways (default=3).
 #' @param UNENRICH_NES (integer) NES cutoff to select unenriched pathways
-#'    (default=0.1)
+#'    (default=0.1).
 #' @param enrich_folder (char) path to directory to store output files
-#' 		(PLINK files per selection-enriched gene set)
+#' 		(PLINK files per selection-enriched gene set).
 #' @param enrichEM_folder (char) path to directory to store output files
-#' 		(PLINK files per selection-enriched pathway, grouped via AutoAnnotate)
+#' 		(PLINK files per selection-enriched pathway, grouped via AutoAnnotate).
 #' @param unenrich_folder (char) path to directory to store output files
-#' 		(PLINK files per unenriched gene set)
+#' 		(PLINK files per unenriched gene set).
 #'
 #' @return none
 #' @export
@@ -27,7 +27,7 @@
 
 writePathFiles <- function(genotype_file, results_file, gseaStat_file,
 													 snp2gene_file, fam_file, EM_group_file,
-												 	 ENRICH_NES, UNENRICH_NES,
+												 	 ENRICH_NES=3, UNENRICH_NES=0.1,
 											   	 enrich_folder, enrichEM_folder, unenrich_folder) {
 
 	# Merge GSEA results from both population comparisons and change column names

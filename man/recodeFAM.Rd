@@ -2,8 +2,7 @@
 % Please edit documentation in R/recodeFAM.R
 \name{recodeFAM}
 \alias{recodeFAM}
-\title{Recodes PLINK fam file with population-specific codes
-adapted from SP plink_baseSetup.R (part of GWAS2pathway package)}
+\title{Recodes PLINK fam file with population-specific codes}
 \usage{
 recodeFAM(
   genotype_file,
@@ -15,24 +14,23 @@ recodeFAM(
 )
 }
 \arguments{
-\item{genotype_file}{(char) path to file with SNP genotype data (PLINK format)}
+\item{genotype_file}{(char) path to PLINK-formatted SNP genotype data.}
 
-\item{pop_one}{(char) character code for the first population.}
+\item{pop_one}{(char) character code for the first population (e.g., CEU).}
 
-\item{pop_two}{(char) character code for the second population.}
+\item{pop_two}{(char) character code for the second population (e.g., YRI).}
 
 \item{population_table}{(char) path to file with population information.
 Gives the number of samples per population in the dataset.}
 
 \item{SET_SEED}{(integer) value for set.seed() before shuffling (default=42).}
 
-\item{out_file}{(char) optional; name for fam file (default=population-coded).
-file extension added.}
+\item{out_file}{(char) name for fam file (default=population-coded).
+File extension added.}
 }
 \value{
 none
 }
 \description{
 Recodes PLINK fam file with population-specific codes
-adapted from SP plink_baseSetup.R (part of GWAS2pathway package)
 }

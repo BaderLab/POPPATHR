@@ -1,4 +1,4 @@
-#' Create EnrichmentMap in Cytoscape to visualize selection-enriched pathways
+#' Plots an EnrichmentMap in Cytoscape to visualize selection-enriched pathways
 #'
 #' @description Create a network where nodes are pathway gene sets significantly
 #'		enriched in two independent population-based GSEA (i.e., validated

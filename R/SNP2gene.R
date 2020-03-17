@@ -1,23 +1,24 @@
-#' Maps SNPs to their nearest genes (for use in setupGSEArun.R)
-#' (adapted from map_SNP2gene from SP's GWAS2pathway package)
+#' Maps SNPs to their nearest genes
 #'
 #' NOTE: updated GenomicRanges to version 1.30.1 on 01/30/2018
 #' Requires ignore.strand=TRUE param to properly run distanceToNearest()
 #' given unknown strand assignment for SNP array-based genotyping info
 #'
-#' @param in_file (char) path to PLINK .bim file (only CHR, SNP, and BP
-#' 		columns considered.
+#' @param in_file (char) path to PLINK bim file (only CHR, SNP, and BP
+#' 		columns considered).
 #' @param refgene_file (char) path to refseq table with header.
-#' @param marg (integer) region upstream and downstream of [txStart,txEnd].
+#' @param marg (integer) region upstream and downstream of [txStart,txEnd] (default=0).
 #' @param out_file (char) path to write snp-to-gene mapping file.
 #'
 #' @return none
 #' @export
 #'
 
-SNP2gene <- function(in_file, refgene_file, marg=0L, out_file) {
+SNP2gene <- function(in_file, refgene_file, marg=0, out_file) {
+
+	# Read in SNP table
 	cat("* Reading SNP table\n")
-	snps <- fread(in_file, h=FALSE, data.table=FALSE) # fread much faster than read.table
+	snps <- fread(in_file, h=FALSE, data.table=FALSE)
 	snp_GR  <- GRanges(paste("chr", snps[,1], sep=""),
 					  				 IRanges(snps[,4], snps[,4]),
 					  			 	 name=snps[,2])

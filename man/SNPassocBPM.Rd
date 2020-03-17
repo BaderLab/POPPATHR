@@ -2,39 +2,40 @@
 % Please edit documentation in R/SNPassocBPM.R
 \name{SNPassocBPM}
 \alias{SNPassocBPM}
-\title{Calculate selection statistics (LD) and perform exploratory analyses
-for two sets of variants via R snpStats package}
+\title{Calculates SNP-SNP association statistics and perform exploratory analyses
+between pathways}
 \usage{
 SNPassocBPM(
   pop_one,
   pop_two,
   snp2gene_file,
-  ASSOC_FDR,
+  ASSOC_FDR = 0.05,
   enrich_folder,
   unenrich_folder,
   output_folder
 )
 }
 \arguments{
-\item{pop_one}{(char) character code for the first population.}
+\item{pop_one}{(char) character code for the first population (e.g., CEU).}
 
-\item{pop_two}{(char) character code for the second population.}
+\item{pop_two}{(char) character code for the second population (e.g., YRI).}
 
-\item{snp2gene_file}{(char) path to file with snp2gene mappings
+\item{snp2gene_file}{(char) path to file with snp-to-gene mappings
 (output of SNP2gene.R).}
 
-\item{ASSOC_FDR}{(interger) FDR value to define significant pathway coevolution.}
+\item{ASSOC_FDR}{(interger) FDR value to define significant pathway coevolution
+(default=0.05).}
 
-\item{enrich_folder}{(char) path to selection-enriched pathway SNP lists}
+\item{enrich_folder}{(char) path to selection-enriched pathway SNP lists.}
 
-\item{unenrich_folder}{(char) path to unenriched pathway SNP lists}
+\item{unenrich_folder}{(char) path to unenriched pathway SNP lists.}
 
-\item{output_folder}{(char) path to output directory}
+\item{output_folder}{(char) path to output directory.}
 }
 \value{
 none
 }
 \description{
-Calculate selection statistics (LD) and perform exploratory analyses
-for two sets of variants via R snpStats package
+Calculates SNP-SNP association statistics and perform exploratory analyses
+between pathways
 }

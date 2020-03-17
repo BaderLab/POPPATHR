@@ -1,20 +1,21 @@
-#' Calculate selection statistics (LD) and perform exploratory analyses
-#' for two sets of variants via R snpStats package
+#' Calculates SNP-SNP association statistics and perform exploratory analyses
+#' between pathways
 #'
-#' @param pop_one (char) character code for the first population.
-#' @param pop_two (char) character code for the second population.
-#' @param snp2gene_file (char) path to file with snp2gene mappings
+#' @param pop_one (char) character code for the first population (e.g., CEU).
+#' @param pop_two (char) character code for the second population (e.g., YRI).
+#' @param snp2gene_file (char) path to file with snp-to-gene mappings
 #'    (output of SNP2gene.R).
-#' @param ASSOC_FDR (interger) FDR value to define significant pathway coevolution.
-#' @param enrich_folder (char) path to selection-enriched pathway SNP lists
-#' @param unenrich_folder (char) path to unenriched pathway SNP lists
-#' @param output_folder (char) path to output directory
+#' @param ASSOC_FDR (interger) FDR value to define significant pathway coevolution
+#'    (default=0.05).
+#' @param enrich_folder (char) path to selection-enriched pathway SNP lists.
+#' @param unenrich_folder (char) path to unenriched pathway SNP lists.
+#' @param output_folder (char) path to output directory.
 #'
 #' @return none
 #' @export
 #'
 
-SNPassocBPM <- function(pop_one, pop_two, snp2gene_file, ASSOC_FDR,
+SNPassocBPM <- function(pop_one, pop_two, snp2gene_file, ASSOC_FDR=0.05,
                         enrich_folder, unenrich_folder,
                         output_folder) {
   # Read in snp2gene file to assign SNPs to genes to remove any

@@ -1,14 +1,13 @@
 #' Recodes PLINK fam file with population-specific codes
-#' adapted from SP plink_baseSetup.R (part of GWAS2pathway package)
 #'
-#' @param genotype_file (char) path to file with SNP genotype data (PLINK format)
-#' @param pop_one (char) character code for the first population.
-#' @param pop_two (char) character code for the second population.
+#' @param genotype_file (char) path to PLINK-formatted SNP genotype data.
+#' @param pop_one (char) character code for the first population (e.g., CEU).
+#' @param pop_two (char) character code for the second population (e.g., YRI).
 #' @param population_table (char) path to file with population information.
 #'		Gives the number of samples per population in the dataset.
 #' @param SET_SEED (integer) value for set.seed() before shuffling (default=42).
-#' @param out_file (char) optional; name for fam file (default=population-coded).
-#'   file extension added.
+#' @param out_file (char) name for fam file (default=population-coded).
+#'   File extension added.
 #'
 #' @return none
 #' @export
@@ -16,6 +15,7 @@
 
 recodeFAM <- function(genotype_file, pop_one, pop_two, population_table,
 											SET_SEED=42, out_file="population-coded") {
+
 	# Keep IDs corresponding to population codes
 	pops <- read.table(population_table, as.is=TRUE, h=TRUE)
 	pop_one_names <- pops[,2][pops[,7] == pop_one]

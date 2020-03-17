@@ -2,42 +2,40 @@
 % Please edit documentation in R/setupGSEArun.R
 \name{setupGSEArun}
 \alias{setupGSEArun}
-\title{Sets up and runs GSEA using population-based FST
-table containing GSEA results (Geneset, Size, ES, NES, NominalP, FDR, FWER)}
+\title{Sets up and runs GSEA using population-based FST values}
 \usage{
 setupGSEArun(
   fst_file,
   annotation_file,
   snp2gene_file,
-  SET_PERM = SET_PERM,
-  SNP2GENE_DIST = SNP2GENE_DIST,
-  MIN_GENE = MIN_GENE,
-  MAX_GENE = MAX_GENE,
+  SET_PERM = 10000,
+  SNP2GENE_DIST = 5e+05,
+  MIN_GENE = 10,
+  MAX_GENE = 300,
   SET_SEED = 42,
   output_folder
 )
 }
 \arguments{
-\item{fst_file}{(char) path to file with SNP-level FST statistics}
+\item{fst_file}{(char) path to file with SNP-level FST statistics.}
 
-\item{annotation_file}{(char) path to pathway definitions GMT file}
+\item{annotation_file}{(char) path to pathway definitions GMT file.}
 
-\item{snp2gene_file}{(char) path to file with snp2gene mappings. Output of
-mapSNP2gene() (found in GWAS2Pathway).}
+\item{snp2gene_file}{(char) path to file with snp2gene mappings (output of SNP2gene.R).}
 
-\item{SET_PERM}{(integer) set cycle of permutations to run
-default=1000}
+\item{SET_PERM}{(integer) set cycle of permutations to run (default=10000).}
 
 \item{SNP2GENE_DIST}{(integer) value for GSEA --distance.
-Max. distance between SNP and gene for their association in snp2gene_file}
+Max. distance between SNP and gene for their association in snp2gene_file
+(default=500000).}
 
 \item{MIN_GENE}{(integer) value for GSEA --setmin.
-Min. number of genes in a gene set to be considered}
+Min. number of genes in a gene set to be considered (default=10).}
 
 \item{MAX_GENE}{(integer) value for GSEA --setmax.
-Max. number of genes in a gene set to be considered}
+Max. number of genes in a gene set to be considered (default=300).}
 
-\item{SET_SEED}{(integer) value for GSEA --seed}
+\item{SET_SEED}{(integer) value for GSEA --seed.}
 
 \item{output_folder}{(char) path to store output files.}
 }
@@ -45,6 +43,5 @@ Max. number of genes in a gene set to be considered}
 none
 }
 \description{
-Sets up and runs GSEA using population-based FST
-table containing GSEA results (Geneset, Size, ES, NES, NominalP, FDR, FWER)
+Sets up and runs GSEA using population-based FST values
 }

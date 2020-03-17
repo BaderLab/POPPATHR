@@ -2,21 +2,21 @@
 % Please edit documentation in R/popPCA.R
 \name{popPCA}
 \alias{popPCA}
-\title{Calculate population stratification between different
+\title{Determines population stratification between different
 ancestry groups (e.g., CEU vs YRI) via complete linkage clustering}
 \usage{
 popPCA(genotype_file, fam_file, pop_one, pop_two, dimensions = 3, out_file)
 }
 \arguments{
-\item{genotype_file}{(char) path to file with SNP genotype data (PLINK format).}
+\item{genotype_file}{(char) path to PLINK-formatted SNP genotype data.}
 
 \item{fam_file}{(char) path to population-coded PLINK fam file.}
 
-\item{pop_one}{(char) character code for the first population.}
+\item{pop_one}{(char) character code for the first population (e.g., CEU).}
 
-\item{pop_two}{(char) character code for the second population.}
+\item{pop_two}{(char) character code for the second population (e.g., YRI).}
 
-\item{dimensions}{(integer) dimensions for which to calculate PCA sim default=3).}
+\item{dimensions}{(integer) dimensions for which to calculate PCA sim (default=3).}
 
 \item{out_file}{(char) path to write PNG image.}
 }
@@ -24,6 +24,6 @@ popPCA(genotype_file, fam_file, pop_one, pop_two, dimensions = 3, out_file)
 none
 }
 \description{
-Calculate population stratification between different
+Determines population stratification between different
 ancestry groups (e.g., CEU vs YRI) via complete linkage clustering
 }

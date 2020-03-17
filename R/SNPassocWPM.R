@@ -1,9 +1,10 @@
-#' Calculate selection statistics (LD) and perform exploratory analyses
-#' for two sets of variants via R snpStats package
+#' Calculates SNP-SNP association statistics and perform exploratory analyses
+#' within pathways
 #'
-#' @param pop_one (char) character code for the first population.
-#' @param pop_two (char) character code for the second population.
-#' @param ASSOC_FDR (interger) FDR value to define significant pathway coevolution.
+#' @param pop_one (char) character code for the first population (e.g., CEU).
+#' @param pop_two (char) character code for the second population (e.g., YRI).
+#' @param ASSOC_FDR (interger) FDR value to define significant pathway coevolution
+#'    (default=0.05).
 #' @param enrich_folder (char) path to selection-enriched pathway SNP lists
 #' @param unenrich_folder (char) path to unenriched pathway SNP lists
 #' @param output_folder (char) path to output directory
@@ -12,7 +13,7 @@
 #' @export
 #'
 
-SNPassocWPM <- function(pop_one, pop_two, ASSOC_FDR,
+SNPassocWPM <- function(pop_one, pop_two, ASSOC_FDR=0.05,
                         enrich_folder, unenrich_folder,
                         output_folder) {
 

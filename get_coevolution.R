@@ -39,7 +39,7 @@ parser$add_argument("--ENRICH_NES", type="integer", default=3,
                     help="NES threshold to define enriched pathway gene sets [default %(default)s]")
 parser$add_argument("--UNENRICH_NES", type="integer", default=0.1,
                     help="NES threshold to define unenriched control pathway gene sets [default %(default)s]")
-parser$add_argument("--ASSOC_FDR", type="integer", default=0.1,
+parser$add_argument("--ASSOC_FDR", type="integer", default=0.05,
                     help="FDR value to define significant pathway coevolution [default %(default)s]")
 args <- parser$parse_args()
 
