@@ -7,8 +7,8 @@
 #------------------------------------------------------------------------------#
 
 # Loads all packages in a way that allows exporting to child environments
-packages <- c("tidyverse", "plyr", "data.table", "reshape2", "gdata", "RColorBrewer",
-              "snpStats", "RCy3", "cowplot", "argparse")
+packages <- c("tidyverse", "dplyr", "data.table", "reshape2", "gdata",
+              "RColorBrewer", "snpStats", "RCy3", "cowplot", "argparse")
 for (p in packages) {
   suppressPackageStartupMessages(library(p, character.only = TRUE))
 }
@@ -52,7 +52,7 @@ pop_pair_one <- "CEU_YRI"
 pop_pair_two <- "CEU_LWK"
 genotype_file <- "genotypes/HM3_2010_05_phase3"
 annotation_file <- "annotations/Human_GOBP_AllPathways_no_GO_iea_April_24_2016_symbol.gmt"
-output_folder <- "output"
+output_folder <- "output/original"
 ENRICH_NES = 3
 UNENRICH_NES = 0.1
 ASSOC_FDR = 0.05
@@ -173,7 +173,7 @@ writePathFiles(
 ######
 
 message("\n** CALCULATING TRANS-CHROMOSOMAL SNP-SNP CORRELATION **\n")
-enrich_folder <- sprintf("%s/pathway_files", enrich_folder)
+enrichEM_folder <- sprintf("%s/pathway_files", enrichEM_folder)
 unenrich_folder <- sprintf("%s/pathway_files", unenrich_folder)
 
 ## WPM (within-pathway model)
@@ -181,8 +181,9 @@ message("\n** WITHIN-PATHWAY **\n")
 SNPassocWPM(
   pop_one=pop_one,
   pop_two=pop_two,
+  snp2gene_file=snp2gene_file,
   ASSOC_FDR=ASSOC_FDR,
-  enrich_folder=enrich_folder,
+  enrich_folder=enrichEM_folder,
   unenrich_folder=unenrich_folder,
   output_folder=wpm_folder
 )

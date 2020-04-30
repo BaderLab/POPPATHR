@@ -12,6 +12,7 @@
 #'
 
 writeEmapFile <- function(results_file, ENRICH_NES=3, out_file) {
+
   # Read in GSEA results files formatted for EnrichmentMap
   cat(sprintf("* Reading in GSEA results file %s\n", results_file))
   resFiles <- lapply(results_file, function(x) read.delim(x, h=TRUE, as.is=TRUE))
@@ -20,14 +21,19 @@ writeEmapFile <- function(results_file, ENRICH_NES=3, out_file) {
     colnames(resFiles[[i]])[2] <- "Description"
     colnames(resFiles[[i]])[3:5] <- paste(colnames(resFiles[[i]][, c(3:5)]), i, sep="_")
   }
-  resComb <- join_all(resFiles, by=c("Geneset", "Description"))
+
+  # Combine results from both population comparisons
+  resComb <- reduce(resFiles, left_join, by=c("Geneset", "Description"))
+
   # Select for enriched pathways
   resComb_enrich <- filter(resComb, NES_1 >= ENRICH_NES & FDR_1 <= 0.05)
   if (length(resFiles) > 1) { # filter by second population analysis if run
     resComb_enrich <- filter(resComb_enrich, NES_2 >= ENRICH_NES & FDR_2 <= 0.05)
   }
+
   # Remove gene set annotation details from Description column
-  ## Needed for AutoAnnotate app to properly annotate aggregated gene sets
+  # Needed for AutoAnnotate app to properly annotate aggregated gene sets
+
   resComb_enrich$Description <- gsub("\\%.*", "", resComb_enrich$Description)
   # Write out file for EnrichmentMap input
   EMout <- resComb_enrich[,c(1:4)]

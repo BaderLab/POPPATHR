@@ -1,5 +1,5 @@
 #' Calculates SNP-SNP association statistics and perform exploratory analyses
-#' between pathways
+#' within pathways
 #'
 #' @param pop_one (char) character code for the first population (e.g., CEU).
 #' @param pop_two (char) character code for the second population (e.g., YRI).
@@ -16,288 +16,291 @@
 #'
 
 SNPassocBPM <- function(pop_one, pop_two, snp2gene_file, ASSOC_FDR=0.05,
-                        enrich_folder, unenrich_folder,
-                        output_folder) {
+                        enrich_folder, unenrich_folder, output_folder) {
+
   # Read in snp2gene file to assign SNPs to genes to remove any
   # matching genes in a given pathway-pathway pair
   snp2gene <- read.table(snp2gene_file, h=FALSE, as.is=TRUE)
   snp2gene <- snp2gene[,-3]
 
-  calcLD <- function(snp_folder, popcode) {
+  # Calculate SNP-SNP association statistics
+  # NOTE: argument 'depth' specifies the max. separation b/w pairs of SNPs
+  # to be considered, so that depth=1 would specify calculation of LD b/w
+  # immediately adjacent SNPs. For our purposes we want to determine LD
+  # b/w all SNPs in each pathway despite their distance from each other,
+  # so we specify depth in ld() as ((number of SNPs)-1)
+  calcAssoc <- function(pathway_set, population_cohort) {
 
-    ss1 <- c(); ss2 <- c()
-    snp.map1 <- c(); snp.map2 <- c()
-    ld.calc <- list(); pairwise.df <- list(); diff <- list()
-    diff.r2 <- list(); diff.dp <- list()
+    # Initiate vectors and lists to fill up with data
+    ss1 <- c(); ss2 <- c(); snp_map1 <- c(); snp_map2 <- c()
+    snp_assoc <- list(); pairwise_df <- list(); diff_df <- list()
 
     # Read PLINK files for each pathway
+    if (pathway_set == "enriched")   { snp_folder <- enrich_folder }
+    if (pathway_set == "unenriched") { snp_folder <- unenrich_folder }
+
+    cat(sprintf("\nReading in %s pathways\n", pathway_set))
     bed <- list.files(path=snp_folder, pattern="*.bed", full.names=TRUE)
     bim <- list.files(path=snp_folder, pattern="*.bim", full.names=TRUE)
     fam <- list.files(path=snp_folder, pattern="*.fam", full.names=TRUE)
 
     # Matrices of all possible pathway x pathway combinations
-    bed.pair <- t(combn(bed, 2))
-    bim.pair <- t(combn(bim, 2))
-    fam.pair <- t(combn(fam, 2))
+    bed_pair <- t(combn(bed, 2))
+    bim_pair <- t(combn(bim, 2))
+    fam_pair <- t(combn(fam, 2))
 
-    for (i in 1:nrow(bed.pair)) {
-      path.name1 <- substr(basename(bim.pair[i,1]), 0, nchar(basename(bim.pair[i,1]))-4)
-      path.name2 <- substr(basename(bim.pair[i,2]), 0, nchar(basename(bim.pair[i,2]))-4)
+    # Run SNP-SNP analysis for each pathway-pathway pair
+    for (i in 1:nrow(bim_pair)) {
 
-      cat(sprintf("BETWEEN-PATHWAY INTERACTION %i (%s total)\n", i, nrow(bim.pair)))
-      cat(sprintf("* Reading SNPs in pathway %s x pathway %s\n", path.name1, path.name2))
+      # Get names of each pathway in pair
+      path_name1 <- gsub("\\..*", "", basename(bim_pair[i,1]))
+      path_name2 <- gsub("\\..*", "", basename(bim_pair[i,2]))
 
-      ss1[[i]] <- read.plink(bed.pair[i,1], bim.pair[i,1], fam.pair[i,1])
-      ss2[[i]] <- read.plink(bed.pair[i,2], bim.pair[i,2], fam.pair[i,2])
+      # Convert PLINK files to snpStats input format
+      # Output object is a list with 3 elements ($genotypes, $fam, $map)
+      # NOTE: order is important!
+      cat(sprintf("BETWEEN-PATHWAY INTERACTION %i (%s total)\n", i, nrow(bim_pair)))
+      cat(sprintf("* Reading SNPs in %s and %s pathways\n", path_name1, path_name2))
+      ss1[[i]] <- read.plink(bed_pair[i,1], bim_pair[i,1], fam_pair[i,1])
+      ss2[[i]] <- read.plink(bed_pair[i,2], bim_pair[i,2], fam_pair[i,2])
 
       # Subset genotypes by population
       # For first pathway of pathway x pathway interaction
-      pop <- which(ss1[[i]]$fam$affected == popcode)
-      ss1[[i]]$genotypes <- ss1[[i]]$genotypes[pop, ]
-      cat(sprintf("\n%i %s genotypes in pathway %s\n", length(pop), ifelse(popcode == 1, pop_one, pop_two), path.name1))
+      pop_code <- ifelse(population_cohort == pop_one, 1, 2)
+      pop_genotypes <- which(ss1[[i]]$fam$affected == pop_code)
+      ss1[[i]]$genotypes <- ss1[[i]]$genotypes[pop_genotypes,]
+      cat(sprintf("\n* Subsetting %i genotypes for %s population(s)\n",
+        length(pop_genotypes), population_cohort))
       print(ss1[[i]]$genotypes)
 
       # For second pathway of pathway x pathway interaction
-      pop <- which(ss2[[i]]$fam$affected == popcode)
-      ss2[[i]]$genotypes <- ss2[[i]]$genotypes[pop, ]
-      cat(sprintf("\n%i %s genotypes in pathway %s\n",
-          length(pop), ifelse(popcode == 1, pop_one, pop_two), path.name2))
+      pop_code <- ifelse(population_cohort == pop_one, 1, 2)
+      pop_genotypes <- which(ss2[[i]]$fam$affected == pop_code)
+      ss2[[i]]$genotypes <- ss2[[i]]$genotypes[pop_genotypes,]
+      cat(sprintf("\n* Subsetting %i genotypes for %s population(s)\n",
+        length(pop_genotypes), population_cohort))
       print(ss2[[i]]$genotypes)
 
-      cat("\n* Calculating pathway x pathway SNP association statistics...\n")
-      ld.calc[[i]] <- ld(x=ss1[[i]]$genotypes, y=ss2[[i]]$genotypes, stats="R.squared")
+      # Calculate SNP association for all SNPs in pathway
+      cat("\n* Calculating SNP-SNP association statistics\n")
+      snp_assoc[[i]] <- ld(x=ss1[[i]]$genotypes, y=ss2[[i]]$genotypes, stats="R.squared")
 
-      snp.map1 <- ss1[[i]]$map # genomic location of each SNP
-      snp.map2 <- ss2[[i]]$map
+      # Get genomic location of each SNP
+      snp_map1 <- ss1[[i]]$map
+      snp_map2 <- ss2[[i]]$map
 
-      r2 <- as.matrix(ld.calc[[i]]) # convert sparseMatrix to regular matrix
-      r2 <- melt(r2) # melt matrix to data frame
-      colnames(r2)[3] <- "R.squared"
+      # Covert association matrix into a data frame
+      assoc_df <- as.matrix(snp_assoc[[i]])  # convert sparseMatrix to regular matrix
+      lowerTriangle(assoc_df, byrow=FALSE, diag=TRUE) <- NA # replace lower triangle and diag with NA
+      assoc_df <- melt(assoc_df)
+      colnames(assoc_df)[3] <- "Rsquared"
 
-      # Create dataframe with pairwise distance calculations for each SNP-SNP pair
-      colnames(r2)[1:2] <- c("snp.name.1", "snp.name.2")
-
-      snp.map1 <- subset(snp.map1, select=c("snp.name", "chromosome", "position"))
-      colnames(snp.map1)[1] <- "snp.name.1"
-      snp.map2 <- subset(snp.map2, select=c("snp.name", "chromosome", "position"))
-      colnames(snp.map2)[1] <- "snp.name.2"
-
-      pairwise <- join(snp.map1, r2, by="snp.name.1")
+      # Generate pariwise distance table for each SNP-SNP pair
+      colnames(assoc_df)[1:2] <- c("snp.name.1", "snp.name.2")
+      snp_map1 <- subset(snp_map1, select=c("snp.name", "chromosome", "position"))
+      colnames(snp_map1)[1] <- "snp.name.1"
+      snp_map2 <- subset(snp_map2, select=c("snp.name", "chromosome", "position"))
+      colnames(snp_map2)[1] <- "snp.name.2"
+      pairwise <- merge(snp_map1, assoc_df, by="snp.name.1")
       colnames(pairwise)[1:3] <- c("snp_1", "chr_1", "pos_1")
-      pairwise <- join(snp.map2, pairwise, by="snp.name.2")
-      colnames(pairwise) <- c("snp_2", "chr_2", "pos_2", "snp_1", "chr_1", "pos_1", "R.squared")
+      pairwise <- merge(snp_map2, pairwise, by="snp.name.2")
+      colnames(pairwise) <- c("snp_2", "chr_2", "pos_2", "snp_1", "chr_1", "pos_1", "Rsquared")
       pairwise <- pairwise[,c(4:6, 1:3, 7)]
-
-      pairwise$pathway_pair1 <- path.name1
-      pairwise$pathway_pair2 <- path.name2
-      pairwise$ixn_num <- sprintf("interaction_%i", i)
+      pairwise$pathway_pair1 <- path_name1
+      pairwise$pathway_pair2 <- path_name2
+      pairwise$interaction <- sprintf("interaction_%i", i)
 
       # Assign SNPs to genes
       colnames(snp2gene) <- c("snp_1", "gene_1")
-      pairwise.df <- join(pairwise, snp2gene, by="snp_1")
+      pairwise <- left_join(pairwise, snp2gene, by="snp_1")
       colnames(snp2gene) <- c("snp_2", "gene_2")
-      pairwise.df <- join(pairwise.df, snp2gene, by="snp_2")
-      cat(sprintf("\tTotal SNP-SNP interactions: %i\n", nrow(pairwise.df)))
+      pairwise <- left_join(pairwise, snp2gene, by="snp_2")
+      cat(sprintf("\tTotal SNP-SNP interactions: %i\n", nrow(pairwise)))
 
-      cat("*Removing any matching genes in pathway x pathway interaction...\n")
-      remove <- intersect(pairwise.df$gene_1, pairwise.df$gene_2)
-      no.match <- pairwise.df[!(pairwise.df$gene_1 %in% remove),]
-      no.match2 <- no.match[!(no.match$gene_2 %in% remove),]
+      # Remove any identical genes in pathway-pathway pair
+      cat("* Removing any matching genes in pathway-pathway interaction... ")
+      remove <- intersect(pairwise$gene_1, pairwise$gene_2)
+      cat(sprintf("found %s\n", length(remove)))
+      no_match <- pairwise[!(pairwise$gene_1 %in% remove),]
+      no_match2 <- no_match[!(no_match$gene_2 %in% remove),]
 
-      cat("*Filtering for trans-chromosomal interactions...\n")
-      diff[[i]] <- filter(no.match2, chr_1 != chr_2)
-      cat(sprintf("\tNew number of interactions: %i\n", nrow(diff[[i]])))
-
-      diff.r2[[i]] <- select(diff[[i]], R.squared) %>% unlist
-      cat("done.\n\n")
+      # Select for SNP-SNP pairs on different chromosomes
+      cat("* Subsetting for trans-chromosomal SNP-SNP pairs\n")
+      pairwise_df[[i]] <- no_match2
+      diff_df[[i]] <- filter(pairwise_df[[i]], chr_1 != chr_2)
+      cat(sprintf("\tNew number of interactions: %i\n\n", nrow(diff_df[[i]])))
     }
 
-    diff.pairs <<- do.call("rbind", diff)
-    diff.num <<- sapply(diff.r2, length)  # all SNP-SNP pairs per pathway interaction
+    # Generate summary files
+    all_pairs_df  <- do.call("rbind", pairwise_df)
+    diff_pairs_df <- do.call("rbind", diff_df)
+    cat(sprintf("* Completed SNP-SNP association analysis for %i pathway-pathway interactions\n", nrow(bim_pair)))
+    cat(sprintf("* Calculated association for %i total SNP pairs\n", nrow(all_pairs_df)))
+    cat(sprintf(" --> %i total trans-chromosomal pairs\n\n", nrow(diff_pairs_df)))
 
-    cat(sprintf("Finished inter-chr LD analysis for %i pathway x pathway interactions.\n",
-        nrow(bed.pair)))
+    # Prepare for output
+    diff_pairs_df$population <- population_cohort
+    diff_pairs_df$set <- pathway_set
+
+    # Return out
+    return(diff_pairs_df)
   }
 
-  # Calculate trans-chromosomal LD stats between enriched pathways
-  cat("* Calculating trans-chromosomal SNP association between selection-enriched pathways\n")
+  # Calculation of all pairwise SNP combinations
+  # n is the number of SNPs in each pathway, divided by 2 to account for
+  # duplicate pairs ("n choose 2")
+  # combos <- function(n) {
+  #   return( n*(n-1)/2 ) }
 
-  # population 1 genotypes only
-  cat(sprintf("\n========== AMONG %s GENOTYPES ==========\n", pop_one))
-  calcLD(snp_folder=enrich_folder, popcode=1)
-  enrich.pop_one <- diff.pairs
-  enrich.pop_one$set <- "Enriched"
-  enrich.pop_one$pop <- pop_one
-  enrich.num.pop_one <- diff.num
-  cat(" done.\n")
-  Sys.sleep(3)
+  # Calculate trans-chromosomal SNP association between enriched pathways
+  # per population cohort
+  enrich_pop_one <- calcAssoc("enriched", pop_one)
+  enrich_pop_two <- calcAssoc("enriched", pop_two)
+  unenrich_pop_one <- calcAssoc("unenriched", pop_one)
+  unenrich_pop_two <- calcAssoc("unenriched", pop_two)
 
-  # population 2 genotypes only
-  cat(sprintf("\n========== AMONG %s GENOTYPES ==========\n", pop_two))
-  calcLD(snp_folder=enrich_folder, popcode=2)
-  enrich.pop_two <- diff.pairs
-  enrich.pop_two$set <- "Enriched"
-  enrich.pop_two$pop <- pop_two
-  enrich.num.pop_two <- diff.num
-  cat(" done.\n")
-  Sys.sleep(3)
+  # Write out tables of SNP-SNP associations per pathway-pathway pair
+  col_pop_one <- sprintf("n_assoc_%s", pop_one)
+  col_pop_two <- sprintf("n_assoc_%s", pop_two)
 
-  # Calculate trans-chromosomal LD stats between unenriched pathways
-  cat("* Calculating trans-chromosomal SNP assocation between unenriched pathways\n")
-
-  # population 1 genotypes only
-  cat(sprintf("\n========== AMONG %s GENOTYPES ==========\n", pop_one))
-  calcLD(snp_folder=unenrich_folder, popcode=1)
-  unenrich.pop_one <- diff.pairs
-  unenrich.pop_one$set <- "Unenriched"
-  unenrich.pop_one$pop <- pop_one
-  unenrich.num.pop_one <- diff.num
-  cat(" done.\n")
-  Sys.sleep(3)
-
-  # population 2 genotypes only
-  cat(sprintf("\n========== AMONG %s GENOTYPES ==========\n", pop_two))
-  calcLD(snp_folder=unenrich_folder, popcode=2)
-  unenrich.pop_two <- diff.pairs
-  unenrich.pop_two$set <- "Unenriched"
-  unenrich.pop_two$pop <- pop_two
-  unenrich.num.pop_two <- diff.num
-  cat(" done.\n")
-  Sys.sleep(3)
-
-  # Write out tables of SNP-SNP interactions per pathway-pathway combo
-  col_pop1 <- sprintf("num_ixns_%s", pop_one)
-  col_pop2 <- sprintf("num_ixns_%s", pop_two)
+  # Get number of SNP-SNP associations per pathway
+  n_enrich_pop_one <- as.data.frame(table(enrich_pop_one$interaction))$Freq
+  n_enrich_pop_two <- as.data.frame(table(enrich_pop_two$interaction))$Freq
+  n_unenrich_pop_one <- as.data.frame(table(unenrich_pop_one$interaction))$Freq
+  n_unenrich_pop_two <- as.data.frame(table(unenrich_pop_two$interaction))$Freq
 
   ## Enriched
-  ixn_enrich <- unique(enrich.pop_one[,c("pathway_pair1", "pathway_pair2")])
-  enrich_df <- data.frame(interaction=ixn_enrich,
-                          pop_one=enrich.num.pop_one,
-                          pop_two=enrich.num.pop_two)
-  colnames(enrich_df)[2] <- col_pop1
-  colnames(enrich_df)[3] <- col_pop2
+  enrich_name <- sprintf("%s/table_BPM_enrich_n_snp_associations.txt", output_folder)
+  enrich <- unique(enrich_pop_one[,c("pathway_pair1", "pathway_pair2")])
+  enrich_df <- data.frame(enrich, pop_one=n_enrich_pop_one, pop_two=n_enrich_pop_two)
+  colnames(enrich_df)[3] <- col_pop_one
+  colnames(enrich_df)[4] <- col_pop_two
+  write.table(enrich_df, file=enrich_name, col=TRUE, row=FALSE, quote=FALSE, sep="\t")
 
-  write.table(enrich_df,
-    sprintf("%s/enrich_num_interactions_pathway-pathway.txt", output_folder),
-      col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
-
-  ixn_unenrich <- unique(unenrich.pop_one[,c("pathway_pair1", "pathway_pair2")])
-  unenrich_df <- data.frame(interaction=ixn_unenrich,
-                            pop_one=unenrich.num.pop_one,
-                            pop_two=unenrich.num.pop_two)
-  colnames(unenrich_df)[2] <- col_pop1
-  colnames(unenrich_df)[3] <- col_pop2
-
-  write.table(unenrich_df,
-    sprintf("%s/unenrich_num_interactions_pathway-pathway.txt", output_folder),
-      col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
-
-  # Get pathway pairs with at least 1 inter-chrom SNP-SNP association
-  unenrich.num.pop_one <- unenrich.num.pop_one[which(unenrich.num.pop_one != 0)]
-  unenrich.num.pop_two <- unenrich.num.pop_two[which(unenrich.num.pop_two != 0)]
+  ## Unenriched
+  unenrich_name <- sprintf("%s/table_BPM_unenrich_n_snp_associations.txt", output_folder)
+  unenrich <- unique(unenrich_pop_one[,c("pathway_pair1", "pathway_pair2")])
+  unenrich_df <- data.frame(unenrich, pop_one=n_unenrich_pop_one, pop_two=n_unenrich_pop_two)
+  colnames(unenrich_df)[3] <- col_pop_one
+  colnames(unenrich_df)[4] <- col_pop_two
+  write.table(unenrich_df, file=unenrich_name, col=TRUE, row=FALSE, quote=FALSE, sep="\t")
 
   ## PLOT STATS
-  cat("\n*Generating trans-chromosomal LD plots and analyses.\n")
-  # Function to determine significance of inter-chrom LD SNP assocition between
-  # selection-enriched pathways vs. cumulative set of unenriched pathways
-  # via the KS test (alternative=less{the CDF of x lies below+right of y})
-  getPvals <- function(dat, pop_name) {
-    # Separate df into 'Enriched' and 'Unenriched' interactions
-    enriched <- filter(dat, pop==pop_name & set=="Enriched")
-    unenriched <- filter(dat, pop==pop_name & set=="Unenriched")
-
-    for (i in 1:length(unique(enriched$ixn_num))) {
-      # Subset for each enriched pathway
-      enrich_path_ld[[i]] <<- subset(enriched, ixn_num==sprintf("interaction_%s", i))
-      # Calculate KS pvalue for each enriched pathway against the entire
-      # set of unenriched pathways; calculated per population
-      ks_pvals[[i]] <<- ks.test(enrich_path_ld[[i]]$R.squared,
-                                unenriched$R.squared,
-                                alternative="less")
-      ks_pvals[[i]] <<- ks_pvals[[i]]$p.value
-    }
-  }
+  cat("\n* Generating plots to demonstrate between-pathway SNP coevolution\n")
 
   # Population-specific pairwise trans-chromosomal r2 per enriched pathway
-  title <- "Pathway-specific SNP-SNP coevolution between enriched pathways"
+  title <- "Pathway-level SNP-SNP coevolution between enriched pathways"
   r2.xaxis.title <- "SNP-SNP association (r2)"
 
   # Merge all results together
-  dat <- rbind(enrich.pop_one, unenrich.pop_one, enrich.pop_two, unenrich.pop_two)
+  dat <- rbind(enrich_pop_one, unenrich_pop_one, enrich_pop_two, unenrich_pop_two)
 
   # Set colour palette and number of colours needed
   cols <- colorRampPalette(brewer.pal(8, "Accent"))
-  npal <- cols(length(unique(dat$ixn_num)))
+  npal <- cols(length(unique(dat$interaction)))
 
   # 1a) Density distribution plot
-  p1 <- ggplot(dat, aes(x=R.squared, colour=ixn_num, fill=ixn_num)) +
-         facet_grid(set~pop) +
+  p1 <- ggplot(dat, aes(x=Rsquared, colour=interaction, fill=interaction)) +
+         facet_grid(set~population) +
          geom_density(alpha=0.2) +
          xlab(r2.xaxis.title) +
          ylab(bquote(bold("Density"))) +
+         theme_bw() +
          scale_fill_manual(values=npal) +
          scale_colour_manual(values=npal) +
-         theme(legend.position="none",
+         theme(text=element_text(family="sans", size=14),
+               legend.position="none",
                strip.text=element_text(face="bold"))
 
   # 1b) eCDF plot (cumulative density at each r2)
-  p2 <- ggplot(dat, aes(x=R.squared, colour=ixn_num)) +
-          facet_grid(set~pop) +
+  p2 <- ggplot(dat, aes(x=Rsquared, colour=interaction)) +
+          facet_grid(set~population) +
           stat_ecdf() +
           xlab(r2.xaxis.title) +
           ylab(bquote(bold("Cumulative density"))) +
+          theme_bw() +
           scale_colour_manual(values=npal) +
-          theme(legend.position="none",
+          theme(text=element_text(family="sans", size=14),
+                legend.position="none",
                 strip.text=element_text(face="bold"))
 
   # 3c,d) Density and eCDF at r2 > 0.2
   p3 <- p1 + xlim(0.2, 1)
   p4 <- p2 + xlim(0.2, 1)
 
-#  cat("\n*Generating plot...")
-#  both <- plot_grid(p1, p2, p3, p4, labels=c("A", "B", "C", "D"), ncol=2, nrow=2)
-#  title <- ggdraw() + draw_label(title, fontface="bold")
-#  both  <- plot_grid(title, both, ncol=1, rel_heights=c(0.1, 1))
-#  filename <- sprintf("%s/between_snp-snp_interchrom_ld_r2.png", output_folder)
-#  save_plot(filename, both, base_height=10, base_width=13.5, base_aspect_ratio=1.2)
-#  cat(sprintf(" saved to %s.\n", filename))
+  cat("* Generating plot...")
+  plot_name <- sprintf("%s/plot_BPM_distribution_SNPassoc.png", output_folder)
+  both <- plot_grid(p1, p2, p3, p4, labels=c("A", "B", "C", "D"), ncol=2, nrow=2)
+  title <- ggdraw() + draw_label(title, fontface="bold")
+  both  <- plot_grid(title, both, ncol=1, rel_heights=c(0.1, 1))
+  save_plot(plot_name, both, base_height=10, base_width=13.5, base_aspect_ratio=1.2)
+  cat(sprintf(" saved to %s.\n", plot_name))
 
-  # Calculate pathway-level p values per population
+  # Calculate p values per population
   enrich_path_ld <- list()
-  ks_pvals <- list()
+  ks_pval <- list()
   res <- list()
 
-  cat("* Determining significant SNP-SNP coevolution between enriched pathways.\n")
-  calcCoev <- function(pop) {
-    # p value function defined above
-    getPvals(dat=dat, pop_name=pop)
+  cat("* Determining significant between-pathway SNP coevolution\n")
 
-    # Generate p value dataframe
-    pvals <- unlist(ks_pvals)
-    pvals_df <- data.frame(interaction=ixn_enrich,
-                           pval=as.data.frame(pvals),
-                           fdr=p.adjust(pvals, method="BH"))
+  # Determine significance of trans-chromosomal SNP-SNP association
+  # per enriched pathway vs. cumulative set of unenriched pathways
+  # via the KS test (alternative=less{the CDF of x lies below+right of y})
+  calcSig <- function(population_cohort) {
 
-    pvals_df <- pvals_df[order(pvals_df$fdr),]
-    sig_paths <- filter(pvals_df, fdr <= 0.2)
-    cat(sprintf("** Pathway-pathway interactions with significant coevolution in %s (FDR<=0.2, N=%s):\n%s\n",
-        pop, nrow(sig_paths), paste(sig_paths$pathway, collapse="\n")))
-    colnames(pvals_df)[2:3] <- paste(colnames(pvals_df)[2:3], sep="_", pop)
-    res[[pop]] <<- pvals_df
+    # Separate data by enriched and unenriched pathways
+    enriched <- filter(dat, population == population_cohort & set == "enriched")
+    unenriched <- filter(dat, population == population_cohort & set == "unenriched")
+
+    # Prepare p-value dataframe
+    pval_df <- data.frame(
+      interaction=unique(enriched$interaction),
+      unique(enriched[,c("pathway_pair1", "pathway_pair2")]),
+      pvalue=NA,
+      qvalue=NA
+    )
+
+    # Calculate p-value per enriched pathway
+    for (ixn in unique(enriched$interaction)) {
+      test_ixn <- subset(enriched, interaction == ixn)
+      ks_test <-
+        suppressWarnings(
+          ks.test(
+            test_ixn$Rsquared,
+            unenriched$Rsquared,
+            alternative="less",
+      ))
+      # Insert pvalue in pval_df
+      ks_pval <- ks_test$p.value
+      pval_df[which(pval_df$interaction == ixn), "pvalue"] <- ks_pval
+    }
+
+    # FDR-correct pvalues for multiple hypothesis testing
+    pval_df <- pval_df[order(pval_df$pvalue),]
+    pval_df$qvalue <- p.adjust(pval_df$pvalue, method="BH")
+
+    # Quantify number of significant pathways
+    n_sig <- filter(pval_df, qvalue <= ASSOC_FDR)
+    cat(sprintf("* Pathway-pathway pairs with significant coevolution in %s population: %s\n",
+      population_cohort, nrow(n_sig)))
 
     # Write out results
-    filename_1 <- sprintf("%s/enrich_coevolution_pval_%s.txt", output_folder, pop)
-    write.table(format(pvals_df, digits=3), file=filename_1,
-        col=TRUE, row=FALSE, quote=FALSE, sep="\t")
-    cat(sprintf("** Table of pathway p-values written to %s.\n", filename_1))
-  }
-  # Run for both populations
-  invisible(mapply(calcCoev, c(pop_one, pop_two)))
+    colnames(pval_df)[2:3] <- paste(colnames(pval_df)[2:3], sep="_", population_cohort)
+    fname_1 <- sprintf("%s/table_BPM_enrich_sig_coevolution_%s.txt", output_folder, population_cohort)
+    write.table(format(pval_df, digits=3), file=fname_1, col=TRUE, row=FALSE, quote=FALSE, sep="\t")
+    cat(sprintf("* Table of pathway p-values written to %s\n", fname_1))
 
-  # Merge both p value dataframes
-  pval_merge <- join(res[[1]], res[[2]], by=c("interaction.pathway_pair1", "interaction.pathway_pair2"))
-  filename_2 <- sprintf("%s/enrich_coevolution_pval_merge_%s_%s.txt", output_folder, pop_one, pop_two)
-  write.table(format(pval_merge, digits=3), file=filename_2,
-      col=TRUE, row=FALSE, quote=FALSE, sep="\t")
-  cat(sprintf("\n** Merged p-value tables written to %s.\n", filename_2))
+    # Return out results as list
+    return(pval_df)
+  }
+
+  # Run for both populations
+  results_pop_one <- calcSig(population_cohort = pop_one)
+  results_pop_two <- calcSig(population_cohort = pop_two)
+
+  # Merge both p value dataframes and write out
+  results <- left_join(results_pop_one, results_pop_two, by="interaction")
+  fname_2 <- sprintf("%s/table_BPM_enrich_sig_coevolution_%s_%s.txt", output_folder, pop_one, pop_two)
+  write.table(format(results, digits=3), file=fname_2, col=TRUE, row=FALSE, quote=FALSE, sep="\t")
+  cat(sprintf("* Merged p-value table written to %s\n", fname_2))
 }
