@@ -136,7 +136,7 @@ writeEmapFile(
   out_file=EM_file
 )
 
-# NOTE Cytoscape requires absolute paths of input files
+# NOTE Cytoscape requires absolute paths for input files
 EM_file <- normalizePath(EM_file)
 annotation_file <- normalizePath(annotation_file)
 
