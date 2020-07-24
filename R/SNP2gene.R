@@ -8,16 +8,16 @@
 #' 		columns considered).
 #' @param refgene_file (char) path to refseq table with header.
 #' @param marg (integer) region upstream and downstream of [txStart,txEnd] (default=0).
-#' @param out_file (char) path to write snp-to-gene mapping file.
+#' @param output_file (char) path to write snp-to-gene mapping file.
 #'
 #' @return none
 #' @export
 #'
 
-SNP2gene <- function(in_file, refgene_file, marg=0, out_file) {
+SNP2gene <- function(in_file, refgene_file, marg=0, output_file) {
 
 	# Read in SNP table
-	cat("* Reading SNP table\n")
+	cat(sprintf("* Reading SNP file: %s\n", in_file))
 	snps <- fread(in_file, h=FALSE, data.table=FALSE)
 	snp_GR  <- GRanges(paste("chr", snps[,1], sep=""),
 					  				 IRanges(snps[,4], snps[,4]),
@@ -33,7 +33,7 @@ SNP2gene <- function(in_file, refgene_file, marg=0, out_file) {
 	start_GR	<- resize(gene_GR, fix="start", width=1L)
 	end_GR		<- resize(gene_GR, fix="end", width=1L)
 
-	cat("* Computing distances\n")
+	cat("* Computing distances between SNPs and genes\n")
 	# SNPs inside the gene domain
 	d0		<- distanceToNearest(snp_GR, gene_GR, ignore.strand=TRUE)
 	dbit	<- d0@elementMetadata$distance
@@ -50,16 +50,15 @@ SNP2gene <- function(in_file, refgene_file, marg=0, out_file) {
 	idx		<- which(dbit > 0) # not in a gene
 	snp2_GR <- snp_GR[idx]
 	cat(sprintf("%i SNPs not inside gene domain\n", length(idx)))
-
 	rm(snp_GR, snps, idx)
 
-	cat("* Computing distance to domain starts\n")
+	cat("** Computing distance to domain starts\n")
 	d1	 <- distanceToNearest(snp2_GR, start_GR, ignore.strand=TRUE)
 	dbit <- d1@elementMetadata$distance
 	d_start <- cbind(d1@from, d1@to, dbit)
 	colnames(d_start)[1:2] <- c("queryHits", "subjectHits")
 
-	cat("* Computing distance to domain ends\n")
+	cat("** Computing distance to domain ends\n")
 	d2	 <- distanceToNearest(snp2_GR, end_GR, ignore.strand=TRUE)
 	dbit <- d2@elementMetadata$distance
 	d_end	<- cbind(d2@from, d2@to, dbit)
@@ -67,7 +66,7 @@ SNP2gene <- function(in_file, refgene_file, marg=0, out_file) {
 
 	if (all.equal(d_start[,1], d_end[,1]) != TRUE) {
 		cat("d_start and d_end have different indexing. You need some other ")
-		cat("way to include all snps\n")
+		cat("way to include all SNPs\n")
 	}
 
 	d_both	<- merge(d_start, d_end, by.x="queryHits", by.y="queryHits")
@@ -83,7 +82,7 @@ SNP2gene <- function(in_file, refgene_file, marg=0, out_file) {
 					 		 	 d_both$dbit.y[idx])
 	out <- rbind(out1, out2, out3)
 
-	cat(sprintf("* Writing output to file %s\n", out_file))
-	options(scipen=10)  # prevent conversion of numbers to sci notation
-	write.table(out, file=out_file, sep="\t", col=FALSE, row=FALSE, quote=FALSE)
+	cat(sprintf("* Writing SNP-gene mapping file to %s\n", output_file))
+	options(scipen=10) # prevent conversion of numbers to sci notation
+	write.table(out, file=output_file, sep="\t", col=FALSE, row=FALSE, quote=FALSE)
 }

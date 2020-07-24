@@ -5,7 +5,7 @@
 \title{Determines population stratification between different
 ancestry groups (e.g., CEU vs YRI) via complete linkage clustering}
 \usage{
-popPCA(genotype_file, fam_file, pop_one, pop_two, dimensions = 3, out_file)
+popPCA(genotype_file, fam_file, pop_one, pop_two, dimensions = 3, output_file)
 }
 \arguments{
 \item{genotype_file}{(char) path to PLINK-formatted SNP genotype data.}
@@ -18,7 +18,7 @@ popPCA(genotype_file, fam_file, pop_one, pop_two, dimensions = 3, out_file)
 
 \item{dimensions}{(integer) dimensions for which to calculate PCA sim (default=3).}
 
-\item{out_file}{(char) path to write PNG image.}
+\item{output_file}{(char) path to write PNG image.}
 }
 \value{
 none

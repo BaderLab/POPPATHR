@@ -22,11 +22,12 @@ for (file in Rfun) { source(file) }
 ######
 
 # Makes argparse object and arguments
-parser <- ArgumentParser(description=" POPPATHR: Population-based pathway analysis of SNP-SNP coevolution.")
-parser$add_argument("-v", "--verbose", action="store_true", default=TRUE,
-                    help="Print verbose output [default TRUE]")
-parser$add_argument("-p", "--population_pair", type="character", default="CEU_YRI",
-                    help="Names of two population cohorts to test [default %(default)s]")
+parser <- ArgumentParser(description=paste("POPPATHR: Population-based pathway analysis of SNP-SNP coevolution.",
+                                           "This script identifies selection-enriched pathways between two population cohorts."))
+parser$add_argument("-v", "--verbose", action="store_false",
+                    help="Print verbose output")
+parser$add_argument("-p", "--population_pair", type="character",
+                    help="Names of two population cohorts to test (e.g., CEU_YRI or CEU_LWK)")
 parser$add_argument("-g", "--genotype_file", type="character", default="data/genotypes/HM3_2010_05_phase3",
                     help="Path to PLINK (bed, bim, fam formatted) SNP genotype files [default %(default)s]")
 parser$add_argument("-t", "--population_table", type="character", default="data/genotypes/relationships_w_pops_041510.txt",
@@ -100,87 +101,92 @@ fst_file <- sprintf("%s/markerFST.txt", fst_folder)
 snp2gene_file <- sprintf("%s/snp2gene.txt", gsea_folder)
 
 #------------------------------------------------------------------------------#
-# IDENTIFY SELECTION-ENRICHED PATHWAY GENE SETS
+# IDENTIFY SELECTION-ENRICHED GENE SETS
 #------------------------------------------------------------------------------#
 
 ######
 # WORK BEGINS
 ######
 
-# Sink messages to file
-#sink(sprintf("%s/runPipeline.log", pop_folder))
+# Sink cats to file
+sink(sprintf("%s/get_enrichment.log", pop_folder))
 
-# List user parameters
-cat("Running POPPATHR with the following input data and parameters...\n")
+# Print user parameters to log
+cat("POPPATHR population-based gene set enrichment analysis\n")
 cat(sprintf(
- "\tPopulations: %s and %s
-  \tOutput directory: %s
-  \tGenotyping dataset: %s
-  \tPathway size limit: %s - %s genes
-  \tSNP-gene mapping threshold: %skb
-  \tPermutation cycles: %s\n",
-  pop_one, pop_two, pop_folder, genotype_file, MIN_GENE, MAX_GENE,
-  SNP2GENE_DIST/1000, SET_PERM
+ "- Hostname: %s
+  - Start time: %s
+  - Populations: %s and %s
+  - Output directory: %s
+  - Genotyping dataset: %s
+  - Gene set annotation file: %s
+  - Genome reference file: %s
+  - Gene set size limit: %s - %s genes
+  - SNP-gene mapping threshold: %skb
+  - Permutation cycles: %s\n",
+  Sys.info()["nodename"], format(Sys.time(), "%a %b %d %X %Y"),
+  pop_one, pop_two, pop_folder, basename(genotype_file), basename(annotation_file),
+  basename(refgene_file), MIN_GENE, MAX_GENE, SNP2GENE_DIST/1000, SET_PERM
 ))
 
 ######
-# RECODE PLINK FAM FILE
+# (1) RECODE PLINK FAM FILE
 ######
 
-message("\n** ASSIGNING POPULATION STATUS TO GENOTYPE DATA **\n")
+cat("\n\n(1) ASSIGNING POPULATION STATUS TO GENOTYPE DATA\n\n")
 recodeFAM(
   genotype_file=genotype_file,
   pop_one=pop_one,
   pop_two=pop_two,
   population_table=population_table,
-  out_file=fam_name
+  output_file=fam_name
 )
 Sys.sleep(3)
 
 ######
-# DETERMINE POPULATION SUBSTRUCTURE
+# (2) DETERMINE POPULATION SUBSTRUCTURE
 ######
 
-message("\n** DETERMINING POPULATION SUBSTRUCTURE **\n")
+cat("\n\n(2) DETERMINING POPULATION SUBSTRUCTURE\n\n")
 popPCA(
   genotype_file=genotype_file,
   fam_file=fam_file,
   pop_one=pop_one,
   pop_two=pop_two,
-  out_file=pca_file
+  output_file=pca_file
 )
 Sys.sleep(3)
 
 ######
-# CALCULATE POPULATION-BASED FST
+# (3) CALCULATE POPULATION-BASED FST
 ######
 
-message("\n** CALCULATING POPULATION-BASED FST **\n")
+cat("\n\n(3) CALCULATING POPULATION-BASED FST\n\n")
 calcFST(
   genotype_file=genotype_file,
   fam_file=fam_file,
   output_folder=fst_folder,
-  out_file=fst_file
+  output_file=fst_file
 )
 Sys.sleep(3)
 
 ######
-# MAP SNPS TO GENES
+# (4) MAP SNPS TO GENES
 ######
 
-message("\n** MAPPING INPUT SNPS TO NEAREST GENE **\n")
+cat("\n\n(4) MAPPING INPUT SNPS TO NEAREST GENE\n\n")
 SNP2gene(
   in_file=snp_file,
   refgene_file=refgene_file,
-  out_file=snp2gene_file
+  output_file=snp2gene_file
 )
 Sys.sleep(3)
 
 ######
-# RUN GSEA
+# (5) RUN GSEA
 ######
 
-message("\n** RUNNING GENE-SET ENRICHMENT ANALYSIS **\n")
+cat("\n\n(5) RUNNING GENE SET ENRICHMENT ANALYSIS\n\n")
 setupGSEArun(
   fst_file=fst_file,
   annotation_file=annotation_file,
@@ -194,4 +200,5 @@ setupGSEArun(
 Sys.sleep(3)
 
 # End sinking
-#sink()
+cat(sprintf("\nEnd time: %s\n", format(Sys.time(), "%a %b %d %X %Y")))
+sink()

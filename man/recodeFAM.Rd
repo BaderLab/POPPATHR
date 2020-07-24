@@ -10,7 +10,7 @@ recodeFAM(
   pop_two,
   population_table,
   SET_SEED = 42,
-  out_file = "population-coded"
+  output_file = "population-coded"
 )
 }
 \arguments{
@@ -25,7 +25,7 @@ Gives the number of samples per population in the dataset.}
 
 \item{SET_SEED}{(integer) value for set.seed() before shuffling (default=42).}
 
-\item{out_file}{(char) name for fam file (default=population-coded).
+\item{output_file}{(char) name for fam file (default=population-coded).
 File extension added.}
 }
 \value{

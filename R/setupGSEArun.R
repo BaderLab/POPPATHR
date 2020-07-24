@@ -28,7 +28,7 @@ setupGSEArun <- function(fst_file, annotation_file, snp2gene_file,
  	resOut  <- sprintf("%s/results.txt", output_folder)
 
 	# Run genotype-permuted GSEA
-	cat("* Running genotype-based permutations\n\n")
+	cat("* Running GSEA using genotype-based permutations\n")
 	genoPermCom <- paste("calculate_gsea.pl %s %s --mapfile %s --cycle %i",
 											 "--setstatfile %s --leout %s --setmin %i --setmax %i",
 											 "--seed %i --distance %i --log %s/calculate_gsea.log")
@@ -39,12 +39,10 @@ setupGSEArun <- function(fst_file, annotation_file, snp2gene_file,
 
   # Combine GSEA results
 	system(sprintf("combine_gsea.pl %s/calculate_gsea.log > %s/combined_res.log",
-		  output_folder, output_folder))
+		 output_folder, output_folder))
 
   # Format results for output
-	cat("* Formatting results for output...")
-  dat <- read.delim(sprintf("%s/combined_res.log", output_folder),
-		skip=1, h=FALSE, as.is=TRUE)
+  dat <- read.delim(sprintf("%s/combined_res.log", output_folder), skip=1, h=FALSE, as.is=TRUE)
   dat[,1] <- sub("Geneset=","",	 dat[,1])
   dat[,2] <- sub("Size=","",		 dat[,2])
   dat[,3] <- sub("ES=","",		   dat[,3])
@@ -54,8 +52,10 @@ setupGSEArun <- function(fst_file, annotation_file, snp2gene_file,
   dat[,7] <- sub("FWER=","",		 dat[,7])
   colnames(dat) <- c("Geneset", "Size", "ES", "NES", "NominalP", "FDR", "FWER")
   dat <- dat[order(dat$FDR),]
-  write.table(dat, file=resOut, sep="\t", col=TRUE, row=FALSE, quote=FALSE)
-	cat(" done.\n")
+
+	# Write out file
+	cat(sprintf("* Writing out GSEA results file to %s\n", resOut))
+	write.table(dat, file=resOut, sep="\t", col=TRUE, row=FALSE, quote=FALSE)
 
 	# Write output to excel format
 	#write.xlsx(dat, file=sprintf("%s/results.xlsx", output_folder), col=TRUE, row=FALSE)

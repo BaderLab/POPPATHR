@@ -22,9 +22,10 @@ for (file in Rfun) { source(file) }
 ######
 
 # Makes argparse object and arguments
-parser <- ArgumentParser(description=" POPPATHR: Population-based pathway analysis of SNP-SNP coevolution.")
-parser$add_argument("-v", "--verbose", action="store_true", default=TRUE,
-                    help="Print verbose output [default TRUE]")
+parser <- ArgumentParser(description=paste("POPPATHR: Population-based pathway analysis of SNP-SNP coevolution.",
+                                           "This script determines significant SNP-SNP coevolution within and between pathways.")
+parser$add_argument("-v", "--verbose", action="store_false",
+                    help="Print verbose output")
 parser$add_argument("-p1", "--population_pair_one", type="character", default="CEU_YRI",
                     help="Names of first population pair tested [default %(default)s]")
 parser$add_argument("-p2", "--population_pair_two", type="character", default=NULL,

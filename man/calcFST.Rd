@@ -4,7 +4,7 @@
 \alias{calcFST}
 \title{Calculates SNP-level FST values given two populations}
 \usage{
-calcFST(genotype_file, fam_file, output_folder, out_file)
+calcFST(genotype_file, fam_file, output_folder, output_file)
 }
 \arguments{
 \item{genotype_file}{(char) path to PLINK-formatted SNP genotype data.}
@@ -13,7 +13,7 @@ calcFST(genotype_file, fam_file, output_folder, out_file)
 
 \item{output_folder}{(char) path to output directory.}
 
-\item{out_file}{(char) path to final GSEA-formatted output file.}
+\item{output_file}{(char) path to final GSEA-formatted input file.}
 }
 \value{
 none

@@ -15,10 +15,9 @@ Imports:
   snpStats,
   RCy3
 Authors@R: person("Catherine", "Ross", email = "catherinem.ross@utoronto.ca", role = c("aut", "cre"))
-Description: A bioinformatics package for determining pathway-level SNP coevolution driven by population-based positive selection.
-License: GPL (>= 2)
+Description: POPPATHR is an R package that determines pathway-level SNP-SNP associations (coevolution) driven by population positive selection to better understand the evolution of human pathways.
 Encoding: UTF-8
-URL: https://github.com/rosscm/POPPATHR
-RoxygenNote: 7.1.0
-Suggests: 
+URL: https://github.com/BaderLab/POPPATHR
+RoxygenNote: 7.1.1
+Suggests:
     testthat

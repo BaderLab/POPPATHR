@@ -4,7 +4,7 @@
 \alias{SNP2gene}
 \title{Maps SNPs to their nearest genes}
 \usage{
-SNP2gene(in_file, refgene_file, marg = 0, out_file)
+SNP2gene(in_file, refgene_file, marg = 0, output_file)
 }
 \arguments{
 \item{in_file}{(char) path to PLINK bim file (only CHR, SNP, and BP
@@ -14,7 +14,7 @@ columns considered).}
 
 \item{marg}{(integer) region upstream and downstream of [txStart,txEnd] (default=0).}
 
-\item{out_file}{(char) path to write snp-to-gene mapping file.}
+\item{output_file}{(char) path to write snp-to-gene mapping file.}
 }
 \value{
 none

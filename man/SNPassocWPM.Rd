@@ -8,6 +8,7 @@ within pathways}
 SNPassocWPM(
   pop_one,
   pop_two,
+  snp2gene_file,
   ASSOC_FDR = 0.05,
   enrich_folder,
   unenrich_folder,
@@ -19,14 +20,17 @@ SNPassocWPM(
 
 \item{pop_two}{(char) character code for the second population (e.g., YRI).}
 
+\item{snp2gene_file}{(char) path to file with snp-to-gene mappings
+(output of SNP2gene.R).}
+
 \item{ASSOC_FDR}{(interger) FDR value to define significant pathway coevolution
 (default=0.05).}
 
-\item{enrich_folder}{(char) path to selection-enriched pathway SNP lists}
+\item{enrich_folder}{(char) path to selection-enriched pathway SNP lists.}
 
-\item{unenrich_folder}{(char) path to unenriched pathway SNP lists}
+\item{unenrich_folder}{(char) path to unenriched pathway SNP lists.}
 
-\item{output_folder}{(char) path to output directory}
+\item{output_folder}{(char) path to output directory.}
 }
 \value{
 none

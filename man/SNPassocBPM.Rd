@@ -3,7 +3,7 @@
 \name{SNPassocBPM}
 \alias{SNPassocBPM}
 \title{Calculates SNP-SNP association statistics and perform exploratory analyses
-between pathways}
+within pathways}
 \usage{
 SNPassocBPM(
   pop_one,
@@ -37,5 +37,5 @@ none
 }
 \description{
 Calculates SNP-SNP association statistics and perform exploratory analyses
-between pathways
+within pathways
 }
