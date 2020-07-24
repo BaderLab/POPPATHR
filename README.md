@@ -188,7 +188,7 @@ Running POPPATHR involves 3 parts that are split into the following scripts (use
 - get_coevolution.R
 - get_properties.R
 
-The pipeline is currently set up to run as default on the inputs we we used for our paper: SNP genotypes for two population comparisons (**CEU_YRI** and **CEU_LWK**) along with the annotation files outlined above. You can run the complete pipeline with these defaults by executing the following shell script on the command line: `sh run_POPPATHR.sh`
+The pipeline is currently set up to run as default on the inputs we used for our paper: SNP genotypes for two population comparisons (**CEU_YRI** and **CEU_LWK**) along with the annotation files outlined above. You can run the complete pipeline with these defaults by executing the following shell script on the command line: `sh run_POPPATHR.sh`
 
 Otherwise, you can supply POPPATHR scripts with your own data. You can find detailed descriptions of all R script arguments in a handy command line interface:
 
@@ -236,7 +236,7 @@ optional arguments:
                         mapping [default 500000.0]
 ```
 
-You will find two results folders in the **output** directory named based on the population comparisons that were run. For example, if you tested **CEU_YRI** and **CEU_LWK** you will find two folders in **output** named accordingly with lots of data inside to peruse.
+You will find two results folders in the **output** directory named by the population comparisons that were run. For example, if you ran `get_enrichment.R` on **CEU_YRI** and **CEU_LWK**, you will find two folders in **output** named accordingly with lots of data inside to peruse.
 
 ## Versioning
 
