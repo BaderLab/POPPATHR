@@ -21,16 +21,13 @@ R packages:
 
 ## Getting started
 
-### Installing
+### Cloning
 
-Install POPPATHR using devtools:
+Clone the package locally from Github using git:
 
 ```
-# Install devtools
-install.packages("devtools")
-
-# Install POPPATHR
-devtools::install_github("BaderLab/POPPATHR")
+# Run on the command line (Terminal)
+git clone https://github.com/BaderLab/POPPATHR.git
 ```
 
 ### Software
