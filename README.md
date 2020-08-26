@@ -214,7 +214,7 @@ optional arguments:
                         Path to table defining population genotypes [default
                         data/genotypes/relationships_w_pops_041510.txt]
   -a ANNOTATION_FILE, --annotation_file ANNOTATION_FILE
-                        Path to gmt file containing pathway annotations
+                        Path to gmt file containing gene set annotations
                         [default data/annotations/Human_GOBP_AllPathways_no_GO
                         _iea_April_24_2016_symbol.gmt]
   -r REFGENE_FILE, --refgene_file REFGENE_FILE
@@ -224,9 +224,9 @@ optional arguments:
                         Path to output folder [default output]
   --SET_PERM SET_PERM   Number of GSEA permutation cycles to run [default
                         10000]
-  --MIN_GENE MIN_GENE   Minimum number of genes permitted in pathway gene set
+  --MIN_GENE MIN_GENE   Minimum number of genes permitted in gene set
                         [default 10]
-  --MAX_GENE MAX_GENE   Maximum number of genes permitted in pathway gene set
+  --MAX_GENE MAX_GENE   Maximum number of genes permitted in gene set
                         [default 300]
   --SNP2GENE_DIST SNP2GENE_DIST
                         Maximum distance (bp) considered for SNP-to-gene
