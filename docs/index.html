@@ -6,19 +6,19 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Population-based pathway analysis of SNP-SNP coevolution • POPPATHR</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
+<script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Population-based pathway analysis of SNP-SNP coevolution">
-<meta property="og:description" content="A bioinformatics package for determining pathway-level SNP coevolution driven by population-based positive selection.">
-<meta name="twitter:card" content="summary">
+<meta property="og:description" content="POPPATHR is an R package that determines pathway-level SNP-SNP associations (coevolution) driven by population positive selection to better understand the evolution of human pathways.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body>
+<body data-spy="scroll" data-target="#toc">
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -49,8 +49,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rosscm/POPPATHR">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/BaderLab/POPPATHR/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -69,81 +69,263 @@
 <div id="poppathr" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#poppathr" class="anchor"></a>POPPATHR</h1></div>
-<p>A bioinformatics package for determining pathway-level SNP coevolution driven by population-based positive selection.</p>
+<p>POPPATHR is an R package that determines pathway-level SNP-SNP associations (coevolution) driven by population positive selection to better understand the evolution of human pathways.</p>
+<div id="prerequisites" class="section level2">
+<h2 class="hasAnchor">
+<a href="#prerequisites" class="anchor"></a>Prerequisites</h2>
+<p>R version &gt; 3.5.0</p>
+<p>Software:</p>
+<ul>
+<li><a href="https://github.com/WGLab/GenGen.git">GenGen</a></li>
+<li><a href="http://www.cog-genomics.org/plink2/">PLINK v1.90</a></li>
+<li><a href="https://cytoscape.org/download.html">Cytoscape</a></li>
+</ul>
+<p>Optional for genome assembly conversion:</p>
+<ul>
+<li><a href="https://genome.sph.umich.edu/wiki/LiftOver">liftOver</a></li>
+<li><a href="https://github.com/sritchie73/liftOverPlink">liftOverPlink</a></li>
+</ul>
+<p>R packages:</p>
+<ul>
+<li>
+<strong>CRAN</strong>: tidyverse, dplyr, data.table, reshape2, gdata, RColorBrewer, cowplot, and argparse</li>
+<li>
+<strong>Bioconductor</strong>: GenomicRanges, snpStats, and RCy3</li>
+</ul>
+</div>
 <div id="getting-started" class="section level2">
 <h2 class="hasAnchor">
-<a href="#getting-started" class="anchor"></a>Getting Started</h2>
-<p>These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.</p>
-<div id="prerequisites" class="section level3">
+<a href="#getting-started" class="anchor"></a>Getting started</h2>
+<div id="cloning" class="section level3">
 <h3 class="hasAnchor">
-<a href="#prerequisites" class="anchor"></a>Prerequisites</h3>
-<p>What things you need to install the software and how to install them</p>
-<pre><code>Give examples</code></pre>
+<a href="#cloning" class="anchor"></a>Cloning</h3>
+<p>Clone the package locally from Github using git:</p>
+<pre><code># Run on the command line (Terminal)
+git clone https://github.com/BaderLab/POPPATHR.git</code></pre>
 </div>
-<div id="installing" class="section level3">
+<div id="software" class="section level3">
 <h3 class="hasAnchor">
-<a href="#installing" class="anchor"></a>Installing</h3>
-<p>A step by step series of examples that tell you how to get a development env running</p>
-<p>Say what the step will be</p>
-<pre><code>Give the example</code></pre>
-<p>And repeat</p>
-<pre><code>until finished</code></pre>
-<p>End with an example of getting some data out of the system or using it for a little demo</p>
+<a href="#software" class="anchor"></a>Software</h3>
+<p>Downloading the software packages above may look something like this (on a Mac):</p>
+<pre><code># Run the following lines on the command line (Terminal)
+
+# Enter POPPATHR software folder
+cd POPPATHR/
+POPPATHR_DIR=$(pwd)
+cd ${POPPATHR_DIR}/data/software
+
+# Clone GenGen repository
+git clone https://github.com/WGLab/GenGen.git
+
+# Download and unzip PLINK
+wget http://s3.amazonaws.com/plink1-assets/plink_mac_20200616.zip
+unzip *.zip -d plink
+rm *.zip
+
+# Download liftOver binary and hg18 to hg19 chain file
+rsync -aP rsync://hgdownload.soe.ucsc.edu/genome/admin/exe/macOSX.x86_64/liftOver ./
+rsync -aP rsync://hgdownload.soe.ucsc.edu/genome/admin/exe/macOSX.x86_64/hgsql ./
+
+# Clone liftOverPlink repository
+git clone https://github.com/sritchie73/liftOverPlink.git
+
+# Add executables to PATH
+echo '' &gt;&gt; ~/.bash_profile
+echo '# POPPATHR software executables' &gt;&gt; ~/.bash_profile
+echo 'export PATH="'${POPPATHR_DIR}/data/software'/GenGen:$PATH"' &gt;&gt; ~/.bash_profile
+echo 'export PATH="'${POPPATHR_DIR}/data/software'/plink:$PATH"' &gt;&gt; ~/.bash_profile
+echo 'export PATH="'${POPPATHR_DIR}/data/software'/liftOverPlink:$PATH"' &gt;&gt; ~/.bash_profile
+
+# Source file for changes to take effect
+source ~/.bash_profile</code></pre>
+<p>Cytoscape needs to be downloaded from your browser using the link <a href="#prerequisites">above</a>.</p>
+</div>
+<div id="data-inputs" class="section level3">
+<h3 class="hasAnchor">
+<a href="#data-inputs" class="anchor"></a>Data inputs</h3>
+<p>You will need two types of data to use POPPATHR:</p>
+<ul>
+<li><a href="#snp-genotypes">SNP genotypes</a></li>
+<li><a href="#gene-set-annotations">Gene set annotations</a></li>
+</ul>
+<p>Plus optional data to dig deeper into your POPPATHR results:</p>
+<ul>
+<li><a href="#functional-genome-annotations">Functional genome annotations</a></li>
+</ul>
+<div id="snp-genotypes" class="section level4">
+<h4 class="hasAnchor">
+<a href="#snp-genotypes" class="anchor"></a>SNP genotypes</h4>
+<p>In the paper, we used population SNP genotype data from the International HapMap Project 3 (HM3). This data required a genome assembly conversion from hg18 to hg19, and needed to be converted to PLINK <a href="http://www.cog-genomics.org/plink/1.9/formats">binary format</a> (bim, bed, fam).</p>
+<pre><code># Enter POPPATHR genotypes folder
+# Assuming POPPATHR_DIR is defined as above
+cd ${POPPATHR_DIR}/data/genotypes
+
+# Define paths to HM3 genotype data and chain file for hg18 to hg19 build conversion
+genotype_file="HM3_2010_05_phase3"
+home_folder="https://ftp.ncbi.nlm.nih.gov/hapmap/genotypes/2010-05_phaseIII"
+chain_file="http://hgdownload.cse.ucsc.edu/goldenpath/hg18/liftOver/hg18ToHg19.over.chain"
+
+# Download file defining individuals per population panel
+population_file="relationships_w_pops_041510.txt"
+wget ${home_folder}/${population_file}
+
+# Re-define paths to HM3 genotype data
+home_folder=${home_folder}/plink_format
+map_file="hapmap3_r3_b36_fwd.consensus.qc.poly.map"
+ped_file="hapmap3_r3_b36_fwd.consensus.qc.poly.ped"
+
+# Download files and unpack
+wget ${home_folder}/${map_file}.gz ${home_folder}/${ped_file}.gz ${chain_file}.gz
+gunzip *.gz
+
+# Run liftOverPlink to convert genome assembly
+liftOverPlink.py -m ${map_file} -p ${ped_file} -o ${genotype_file} \
+                 -e ${POPPATHR_DIR}/data/software/liftOver \
+                 -c ${POPPATHR_DIR}/data/genotypes/$(basename -- ${chain_file})
+
+# Convert to PLINK binary format
+plink --file ${genotype_file} --make-bed --out ${genotype_file}</code></pre>
+</div>
+<div id="gene-set-annotations" class="section level4">
+<h4 class="hasAnchor">
+<a href="#gene-set-annotations" class="anchor"></a>Gene set annotations</h4>
+<p>To identify selection-enriched pathways by gene set enrichment analysis (implemented via GenGen), we used a set of gene set annotations from the <a href="http://download.baderlab.org/EM_Genesets/">Bader lab</a>.</p>
+<p>The particular set we used contains only gene sets from GO biological process excluding annotations that have evidence code IEA (inferred from electronic annotation), ND (no biological data available), and RCA (inferred from reviewed computational analysis) and all pathway resources.</p>
+<pre><code># Enter POPPATHR annotations folder
+# Assuming POPPATHR_DIR is defined as above
+cd ${POPPATHR_DIR}/data/annotations
+
+# Define path to file
+home_folder="http://download.baderlab.org/EM_Genesets/"
+
+# NOTE: we used the annotation file dated April 26 2016
+date="April_24_2016"
+organism="Human"
+key_type="symbol"
+file_path="${organism}_GOBP_AllPathways_no_GO_iea_${date}_${key_type}.gmt"
+
+# Download file
+wget ${home_folder}/${date}/${organism}/${key_type}/${file_path}</code></pre>
+</div>
+<div id="functional-genome-annotations" class="section level4">
+<h4 class="hasAnchor">
+<a href="#functional-genome-annotations" class="anchor"></a>Functional genome annotations</h4>
+<p>To assess the functionality of the identified selection-enriched pathways, we integrated the pathway variants with various genomic annotation features: <a href="https://www.ebi.ac.uk/gwas/">GWAS traits and diseases</a>, <a href="https://www.gtexportal.org/home/">expression quantitative trait loci (eQTLs)</a>, <a href="https://omim.org/">disease phenotypes</a>, and <a href="http://www.dgidb.org/">drug targets</a>.</p>
+<p>To download data disease phenotype data from OMIM, you will need to request access and obtain a valid API key (do so <a href="https://www.omim.org/api">here</a>).</p>
+<pre><code># Enter POPPATHR annotations folder
+# Assuming POPPATHR_DIR is defined as above
+cd ${POPPATHR_DIR}/data/annotations
+
+# NHGRI-EBI GWAS file
+gwas_file="https://www.ebi.ac.uk/gwas/api/search/downloads/alternative"
+gwas_out="nhgri_gwas_hits.txt"
+wget ${gwas_file} -O ${gwas_out}
+
+# DGIdb drug-gene interaction file
+drug_file="http://www.dgidb.org/data/interactions.tsv"
+drug_out="dgidb_drug_gene_interactions.txt"
+wget ${drug_file} -O ${drug_out}
+
+# OMIM disease-gene association file
+omim_file="https://data.omim.org/downloads/[YOUR-API-KEY]/morbidmap.txt"
+omim_out="omim_disease_gene_interactions.txt"
+wget ${omim_file} -O ${omim_out}
+
+# GTEx genotype-tissue expression files
+# NOTE: large file after unpacking (5GB)
+eqtl_file="https://storage.googleapis.com/gtex_analysis_v7/single_tissue_eqtl_data/GTEx_Analysis_v7_eQTL.tar.gz"
+eqtl_out="gtex_eqtl_V7"
+mkdir ${eqtl_out}
+wget ${eqtl_file} -O ${eqtl_out}.tar.gz
+tar -zxvf ${eqtl_out}.tar.gz -C ${eqtl_out} --strip-components 1
+gzip -d ${eqtl_out}/*
+rm ${eqtl_out}.tar.gz</code></pre>
 </div>
 </div>
-<div id="running-the-tests" class="section level2">
+</div>
+<div id="basic-usage" class="section level2">
 <h2 class="hasAnchor">
-<a href="#running-the-tests" class="anchor"></a>Running the tests</h2>
-<p>Explain how to run the automated tests for this system</p>
-<div id="break-down-into-end-to-end-tests" class="section level3">
-<h3 class="hasAnchor">
-<a href="#break-down-into-end-to-end-tests" class="anchor"></a>Break down into end to end tests</h3>
-<p>Explain what these tests test and why</p>
-<pre><code>Give an example</code></pre>
-</div>
-<div id="and-coding-style-tests" class="section level3">
-<h3 class="hasAnchor">
-<a href="#and-coding-style-tests" class="anchor"></a>And coding style tests</h3>
-<p>Explain what these tests test and why</p>
-<pre><code>Give an example</code></pre>
-</div>
+<a href="#basic-usage" class="anchor"></a>Basic usage</h2>
+<p>You’ve made it to this step, hurray!</p>
+<p>Running POPPATHR involves 3 parts that are split into the following scripts (used in this order):</p>
+<ul>
+<li>get_enrichment.R</li>
+<li>get_coevolution.R</li>
+<li>get_properties.R</li>
+</ul>
+<p>The pipeline is currently set up to run as default on the inputs we used for our paper: SNP genotypes for two population comparisons (<strong>CEU_YRI</strong> and <strong>CEU_LWK</strong>) along with the annotation files outlined above. You can run the complete pipeline with these defaults by executing the following shell script on the command line: <code>sh run_POPPATHR.sh</code></p>
+<p>Otherwise, you can supply POPPATHR scripts with your own data. You can find detailed descriptions of all R script arguments in a handy command line interface:</p>
+<pre><code>Rscript get_enrichment.R --help
+
+usage: get_enrichment.R [-h] [-v] [-p POPULATION_PAIR] [-g GENOTYPE_FILE]
+                        [-t POPULATION_TABLE] [-a ANNOTATION_FILE]
+                        [-r REFGENE_FILE] [-o OUTPUT_FOLDER]
+                        [--SET_PERM SET_PERM] [--MIN_GENE MIN_GENE]
+                        [--MAX_GENE MAX_GENE] [--SNP2GENE_DIST SNP2GENE_DIST]
+
+POPPATHR: Population-based pathway analysis of SNP-SNP coevolution. This
+script identifies selection-enriched pathways between two population cohorts.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         Print verbose output
+  -p POPULATION_PAIR, --population_pair POPULATION_PAIR
+                        Names of two population cohorts to test (e.g., CEU_YRI
+                        or CEU_LWK)
+  -g GENOTYPE_FILE, --genotype_file GENOTYPE_FILE
+                        Path to PLINK (bed, bim, fam formatted) SNP genotype
+                        files [default data/genotypes/HM3_2010_05_phase3]
+  -t POPULATION_TABLE, --population_table POPULATION_TABLE
+                        Path to table defining population genotypes [default
+                        data/genotypes/relationships_w_pops_041510.txt]
+  -a ANNOTATION_FILE, --annotation_file ANNOTATION_FILE
+                        Path to gmt file containing gene set annotations
+                        [default data/annotations/Human_GOBP_AllPathways_no_GO
+                        _iea_April_24_2016_symbol.gmt]
+  -r REFGENE_FILE, --refgene_file REFGENE_FILE
+                        Path to refGene genome annotation file [default
+                        data/annotations/refGene.hg19.header.txt]
+  -o OUTPUT_FOLDER, --output_folder OUTPUT_FOLDER
+                        Path to output folder [default output]
+  --SET_PERM SET_PERM   Number of GSEA permutation cycles to run [default
+                        10000]
+  --MIN_GENE MIN_GENE   Minimum number of genes permitted in gene set
+                        [default 10]
+  --MAX_GENE MAX_GENE   Maximum number of genes permitted in gene set
+                        [default 300]
+  --SNP2GENE_DIST SNP2GENE_DIST
+                        Maximum distance (bp) considered for SNP-to-gene
+                        mapping [default 500000.0]</code></pre>
+<p>You will find two results folders in the <strong>output</strong> directory named by the population comparisons that were run. For example, if you ran <code>get_enrichment.R</code> on <strong>CEU_YRI</strong> and <strong>CEU_LWK</strong>, you will find two folders in <strong>output</strong> named accordingly with lots of data inside to peruse.</p>
 </div>
 <div id="versioning" class="section level2">
 <h2 class="hasAnchor">
 <a href="#versioning" class="anchor"></a>Versioning</h2>
-<p>We use <a href="http://semver.org/">SemVer</a> for versioning. For the versions available, see the <a href="https://github.com/your/project/tags">tags on this repository</a>.</p>
+<p>For the versions available, see the <a href="https://github.com/BaderLab/POPPATHR/tags">tags on this repository</a>.</p>
 </div>
 <div id="authors" class="section level2">
 <h2 class="hasAnchor">
 <a href="#authors" class="anchor"></a>Authors</h2>
 <ul>
 <li><strong>Catherine Ross</strong></li>
-</ul>
-</div>
-<div id="acknowledgments" class="section level2">
-<h2 class="hasAnchor">
-<a href="#acknowledgments" class="anchor"></a>Acknowledgments</h2>
-<ul>
-<li>Hat tip to anyone whose code was used</li>
-<li>Inspiration</li>
-<li>etc</li>
+<li><strong>Shraddha Pai</strong></li>
 </ul>
 </div>
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/rosscm/POPPATHR">https://​github.com/​rosscm/​POPPATHR</a>
+<li>Browse source code at <br><a href="https://github.com/BaderLab/POPPATHR/">https://​github.com/​BaderLab/​POPPATHR/​</a>
 </li>
 </ul>
 </div>
 <div class="license">
 <h2>License</h2>
 <ul class="list-unstyled">
-<li>GPL (&gt;= 2)</li>
+<li>NA</li>
 </ul>
 </div>
 <div class="developers">
@@ -162,7 +344,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

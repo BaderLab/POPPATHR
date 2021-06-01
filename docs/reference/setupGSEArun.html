@@ -6,28 +6,31 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Sets up and runs GSEA using population-based FST
-table containing GSEA results (Geneset, Size, ES, NES, NominalP, FDR, FWER) — setupGSEArun • POPPATHR</title>
+<title>Sets up and runs GSEA using population-based FST values — setupGSEArun • POPPATHR</title>
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -36,11 +39,8 @@ table containing GSEA results (Geneset, Size, ES, NES, NominalP, FDR, FWER) — 
 
 
 
-<meta property="og:title" content="Sets up and runs GSEA using population-based FST
-table containing GSEA results (Geneset, Size, ES, NES, NominalP, FDR, FWER) — setupGSEArun" />
-<meta property="og:description" content="Sets up and runs GSEA using population-based FST
-table containing GSEA results (Geneset, Size, ES, NES, NominalP, FDR, FWER)" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:title" content="Sets up and runs GSEA using population-based FST values — setupGSEArun" />
+<meta property="og:description" content="Sets up and runs GSEA using population-based FST values" />
 
 
 
@@ -58,7 +58,7 @@ table containing GSEA results (Geneset, Size, ES, NES, NominalP, FDR, FWER)" />
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -80,7 +80,7 @@ table containing GSEA results (Geneset, Size, ES, NES, NominalP, FDR, FWER)" />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -90,8 +90,8 @@ table containing GSEA results (Geneset, Size, ES, NES, NominalP, FDR, FWER)" />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/rosscm/POPPATHR">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/BaderLab/POPPATHR/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -108,68 +108,65 @@ table containing GSEA results (Geneset, Size, ES, NES, NominalP, FDR, FWER)" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Sets up and runs GSEA using population-based FST
-table containing GSEA results (Geneset, Size, ES, NES, NominalP, FDR, FWER)</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rosscm/POPPATHR/blob/master/R/setupGSEArun.R'><code>R/setupGSEArun.R</code></a></small>
+    <h1>Sets up and runs GSEA using population-based FST values</h1>
+    <small class="dont-index">Source: <a href='https://github.com/BaderLab/POPPATHR/blob/master/R/setupGSEArun.R'><code>R/setupGSEArun.R</code></a></small>
     <div class="hidden name"><code>setupGSEArun.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Sets up and runs GSEA using population-based FST
-table containing GSEA results (Geneset, Size, ES, NES, NominalP, FDR, FWER)</p>
+    <p>Sets up and runs GSEA using population-based FST values</p>
     </div>
 
-    <pre class="usage"><span class='fu'>setupGSEArun</span>(
-  <span class='no'>fst_file</span>,
-  <span class='no'>annotation_file</span>,
-  <span class='no'>snp2gene_file</span>,
-  <span class='kw'>SET_PERM</span> <span class='kw'>=</span> <span class='no'>SET_PERM</span>,
-  <span class='kw'>SNP2GENE_DIST</span> <span class='kw'>=</span> <span class='no'>SNP2GENE_DIST</span>,
-  <span class='kw'>MIN_GENE</span> <span class='kw'>=</span> <span class='no'>MIN_GENE</span>,
-  <span class='kw'>MAX_GENE</span> <span class='kw'>=</span> <span class='no'>MAX_GENE</span>,
-  <span class='kw'>SET_SEED</span> <span class='kw'>=</span> <span class='fl'>42</span>,
-  <span class='no'>output_folder</span>
-)</pre>
+    <pre class="usage"><span class='fu'>setupGSEArun</span><span class='op'>(</span>
+  <span class='va'>fst_file</span>,
+  <span class='va'>annotation_file</span>,
+  <span class='va'>snp2gene_file</span>,
+  SET_PERM <span class='op'>=</span> <span class='fl'>10000</span>,
+  SNP2GENE_DIST <span class='op'>=</span> <span class='fl'>5e+05</span>,
+  MIN_GENE <span class='op'>=</span> <span class='fl'>10</span>,
+  MAX_GENE <span class='op'>=</span> <span class='fl'>300</span>,
+  SET_SEED <span class='op'>=</span> <span class='fl'>42</span>,
+  <span class='va'>output_folder</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>fst_file</th>
-      <td><p>(char) path to file with SNP-level FST statistics</p></td>
+      <td><p>(char) path to file with SNP-level FST statistics.</p></td>
     </tr>
     <tr>
       <th>annotation_file</th>
-      <td><p>(char) path to pathway definitions GMT file</p></td>
+      <td><p>(char) path to pathway definitions GMT file.</p></td>
     </tr>
     <tr>
       <th>snp2gene_file</th>
-      <td><p>(char) path to file with snp2gene mappings. Output of
-mapSNP2gene() (found in GWAS2Pathway).</p></td>
+      <td><p>(char) path to file with snp2gene mappings (output of SNP2gene.R).</p></td>
     </tr>
     <tr>
       <th>SET_PERM</th>
-      <td><p>(integer) set cycle of permutations to run
-default=1000</p></td>
+      <td><p>(integer) set cycle of permutations to run (default=10000).</p></td>
     </tr>
     <tr>
       <th>SNP2GENE_DIST</th>
       <td><p>(integer) value for GSEA --distance.
-Max. distance between SNP and gene for their association in snp2gene_file</p></td>
+Max. distance between SNP and gene for their association in snp2gene_file
+(default=500000).</p></td>
     </tr>
     <tr>
       <th>MIN_GENE</th>
       <td><p>(integer) value for GSEA --setmin.
-Min. number of genes in a gene set to be considered</p></td>
+Min. number of genes in a gene set to be considered (default=10).</p></td>
     </tr>
     <tr>
       <th>MAX_GENE</th>
       <td><p>(integer) value for GSEA --setmax.
-Max. number of genes in a gene set to be considered</p></td>
+Max. number of genes in a gene set to be considered (default=300).</p></td>
     </tr>
     <tr>
       <th>SET_SEED</th>
-      <td><p>(integer) value for GSEA --seed</p></td>
+      <td><p>(integer) value for GSEA --seed.</p></td>
     </tr>
     <tr>
       <th>output_folder</th>
@@ -182,13 +179,10 @@ Max. number of genes in a gene set to be considered</p></td>
     <p>none</p>
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -199,7 +193,7 @@ Max. number of genes in a gene set to be considered</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
