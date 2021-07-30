@@ -1,190 +1,182 @@
 #' Generates SNP lists per selection-enriched and unenriched pathway
 #' as determined by GSEA
 #'
-#' @param genotype_file (char) path to file with SNP genotype data (PLINK format).
-#' @param results_file (char) path to files with GSEA results.
-#' 		Strutured to compare results of two population analyses
-#' 		i.e., CEU vs. YRI and CEU vs. LWK.
-#' @param gseaStat_file (char) path to GSEA statistics file.
-#' @param snp2gene_file (char) path to SNP-gene mapping file.
-#' @param fam_file (char) path to PLINK population coded fam file.
-#' @param EM_group_file (char) file path to write pathway groupings as determined
-#' 		by EnrichmentMap.
-#' @param ENRICH_NES (integer) NES cutoff to select validated selection-enriched
-#'		pathways (default=3).
-#' @param UNENRICH_NES (integer) NES cutoff to select unenriched pathways
-#'    (default=0.1).
-#' @param enrich_folder (char) path to directory to store output files
-#' 		(PLINK files per selection-enriched gene set).
-#' @param enrichEM_folder (char) path to directory to store output files
-#' 		(PLINK files per selection-enriched pathway, grouped via AutoAnnotate).
-#' @param unenrich_folder (char) path to directory to store output files
-#' 		(PLINK files per unenriched gene set).
-#'
-#' @return none
+#' @param genotypeFile (char) path to file with SNP genotype data (PLINK format).
+#' @param resultsFile (char) path to files with GSEA results of two population
+#' comparisons (i.e., CEU vs. YRI and CEU vs. LWK)
+#' @param snp2geneFstFile (char) path to SNP-gene mapping with FST file.
+#' @param famFile (char) path to PLINK population coded fam file.
+#' @param emGroupFile (char) file path to write pathway groupings as determined
+#' by EnrichmentMap.
+#' @param enrichFDR (integer) FDR cutoff to select validated selection-enriched
+#' pathways (default=0.05).
+#' @param unenrichNES (integer) NES cutoff to select unenriched pathways
+#' (default=1).
+#' @param enrichFolder (char) path to directory to store output files
+#' (PLINK files per selection-enriched gene set).
+#' @param enrichEMFolder (char) path to directory to store output files
+#' (PLINK files per selection-enriched pathway, grouped via AutoAnnotate).
+#' @param unenrichFolder (char) path to directory to store output files
+#' (PLINK files per unenriched gene set).
 #' @export
-#'
+writePathFiles <- function(genotypeFile, resultsFile,
+	snp2geneFile, famFile, emGroupFile, enrichFDR=3, unenrichNES=1,
+	enrichFolder, enrichEMFolder, unenrichFolder) {
 
-writePathFiles <- function(genotype_file, results_file, gseaStat_file,
-													 snp2gene_file, fam_file, EM_group_file,
-												 	 ENRICH_NES=3, UNENRICH_NES=0.1,
-											   	 enrich_folder, enrichEM_folder, unenrich_folder) {
+	# Read in snp2geneFst file
+	snpFst <- read.delim(snp2geneFstFile, h=TRUE, as.is=TRUE)
 
-	# Read in GSEA results for each population comparisons
-	cat(sprintf("Reading in GSEA results file: %s\n", results_file))
-	gsea_results <- lapply(results_file, function(x) read.delim(x, h=TRUE, stringsAsFactors=FALSE))
-	for (i in seq_along(gsea_results)) {
-		colnames(gsea_results[[i]])[2:7] <- paste(colnames(gsea_results[[i]][, c(2:7)]), i, sep="_")
-	}
+	# Read in GSEA results files formatted for EnrichmentMap
+    cat(sprintf("* Reading in GSEA results file %s\n", resultsFile))
+    resNames <- lapply(strsplit(resultsFile, "\\/"), "[", 2)
+    resFiles <- lapply(resultsFile, function(x) read.delim(x, h=TRUE, as.is=TRUE))
 
-	# Merge GSEA results from both population comparisons
-	gsea_results_merge <- reduce(gsea_results, left_join, by="Geneset")
+    # Prepare data to combine
+    for (i in seq_along(resFiles)) {
+		resFiles[[i]] <- resFiles[[i]][,c("pathway", "pval", "padj", "NES", "leadingEdge")]
+        colnames(resFiles[[i]])[2:ncol(resFiles[[i]])] <- paste(colnames(resFiles[[i]][2:ncol(resFiles[[i]])]), resNames[i], sep="_")
+    }
+
+	# Combine results from both population comparisons
+    resComb <- purrr::reduce(resFiles, left_join, by="pathway")
 
 	# Define function to grab pathway information (SNPs/genes)
-	pathInfo <- function(pathway_set, NES, output_folder) {
+	pathInfo <- function(pathwaySet, pathwayStat, outputFolder) {
+
+		# Prepare output files
+		pathwayOut <- sprintf("%s/results_%s.txt", outputFolder, pathwaySet)
+		nameOut <- sprintf("%s/pathways_%s.txt", outputFolder, pathwaySet)
+		statOut <- sprintf("%s/stats_%s.txt", outputFolder, pathwaySet)
 
 		# Generate output directory for SNP/gene files per pathway set
-		cat(sprintf("\nWriting pathway files for %s pathways\n\n", pathway_set))
-		path_folder <- sprintf("%s/pathway_files", output_folder)
-		if (!dir.exists(path_folder)) { dir.create(path_folder) }
+		cat(sprintf("\n* Writing pathway files for %s pathways\n\n", pathwaySet))
+		pathFolder <- sprintf("%s/pathwayFiles", outputFolder)
+		if (!dir.exists(pathFolder)) dir.create(pathFolder)
 
 		# Define pathways in specified pathway set
-		cat(sprintf("* Identifying %s pathways from GSEA results...", pathway_set))
-		if (pathway_set == "enriched" | pathway_set == "enrichedEM") {
-
-			# Grab enriched pathways via defined NES cutoff
-			pathways <- filter(gsea_results_merge, NES_1 >= NES & FDR_1 <= 0.05)
-			if (length(gsea_results) > 1) { # if run, use second population comparison to validate results
-				pathways <- filter(pathways, NES_2 >= NES & FDR_2 <= 0.05)
+		cat(sprintf("* Getting table of %s pathways from GSEA results...", pathwaySet))
+		if (pathwaySet == "enriched" | pathwaySet == "enrichedEM") {
+			pathways <- filter(resComb, get(paste0("padj_", resNames[1])) <= 0.05)
+			if (length(resFiles) > 1) {
+				pathways <- filter(pathways, get(paste0("padj_", resNames[2])) <= 0.05)
 			}
-		} else if (pathway_set == "unenriched") {
+		}
 
-			# Grab unenriched pathways via defined NES cutoff
-			pathways <- filter(gsea_results_merge, NES_1 <= NES & NES_1 >= -NES)
-			if (length(gsea_results) > 1) { # if run, use second population comparison to validate results
-				pathways <- filter(pathways, NES_2 <= NES & NES_2 >= -NES)
+		if (pathwaySet == "unenriched") {
+			pathways <- filter(resComb, NES_CEU_YRI < 1)
+			if (length(resFiles) > 1) {
+				pathways <- filter(pathways, NES_CEU_LWK < 1)
 			}
+			# Subset unenriched set to be same size as enriched
+			n_enrich <- length(readLines(file.path(enrichFolder, "pathways_enriched.txt")))
+			pathways <- pathways[(nrow(pathways)-n_enrich+1):nrow(pathways),]
 		}
 
 		# Write out to file
-		pathway_file <- sprintf("%s/results_%s.txt", output_folder, pathway_set)
-		cat(sprintf(" writing out to %s\n", pathway_file))
-		write.table(pathways, file=pathway_file, col=TRUE, row=FALSE, quote=FALSE, sep="\t")
+		cat(sprintf(" writing out to %s\n", pathwayOut))
+		write.table(pathways, file=pathwayOut, col=TRUE, row=FALSE, quote=FALSE, sep="\t")
 
-		# Define pathway names
-		cat(sprintf("* Grabbing names for %i %s pathways...", nrow(pathways), pathway_set))
-		pathway_names <- pathways[,1] # pathway names
-		name_file <- sprintf("%s/pathways_%s.txt", output_folder, pathway_set)
-		cat(sprintf(" writing out to %s", name_file))
-		write.table(pathway_names, file=name_file, col=FALSE, row=FALSE, quote=FALSE)
-
-		# Subset GSEA statistics by define pathway names
-		## NOTE --colour-never flag specifically for OSX, issue with readLines
-		## reading ANSI color codes from grep output
-		cat("\n* Subsetting GSEA statistics file...")
-		stat_file <- sprintf("%s/gseaStatFile_%s.txt", output_folder, pathway_set)
-		cmd <- sprintf("grep --colour=never -f %s %s > %s", name_file, gseaStat_file, stat_file)
-		cat(sprintf(" writing out to %s\n", stat_file))
-		system(cmd)
-
-		# Get SNP/gene information for defined pathways
-		load(EM_group_file)
-		no_col <- max(count.fields(stat_file)) # get max number of columns in file
-		gsea_stat <- readLines(stat_file) # read in lines
-		gsea_stat <- str_split_fixed(gsea_stat, "\t", no_col)
-		gsea_stat <- t(gsea_stat) # transpose data
-
-		# Define pathways to grab information from
-		if (pathway_set == "enrichedEM") {
-			pathway_grab <- EM_group_list
-			pathway_name <- names(pathway_grab)
+		# Define pathways to grab SNP/gene info for
+		if (pathwaySet == "enrichedEM") {
+			load(emGroupFile)
+			pathwayNames <- names(emGroupList)
 		} else {
-			pathway_grab <- gsea_stat
-			pathway_name <- pathway_grab[1,]
+			pathwayNames <- pathways[,"pathway"]
 		}
 
-		# Pull SNP/gene information per pathway
-		for (i in seq_along(pathway_name)) {
-			if (pathway_set == "enrichedEM") {
+		cat(sprintf("* Grabbing names for %i %s pathways...", length(pathwayNames), pathwaySet))
+		cat(sprintf(" writing out to %s", nameOut))
+		write.table(pathwayNames, file=nameOut, col=FALSE, row=FALSE, quote=FALSE)
 
-				# Remember, enrichedEM defines multiple pathway gene sets per pathway
-				# So we are dealing with several gene sets in an EM-defined pathway in many cases
-				pathway_i <- gsea_stat[,which(gsea_stat[1,] %in% pathway_grab[[i]])]
-				# Remove pathway names from matrix
-				if (!length(ncol(pathway_i))) {
-					pathway_i <- pathway_i[-1]
+
+		# Pull SNP/gene information per pathway
+		statList <- list()
+		for (i in seq_along(pathwayNames)) {
+			print(i)
+
+			if (pathwaySet == "enrichedEM") {
+				# Leading edge genes for all pathways in EM group
+				if (length(grep("\\+|\\(", emGroupList[[i]]))) {
+					em_i <- grep(paste(emGroupList[[i]], collapse="|"), pathways[,"pathway"], fixed = TRUE)
 				} else {
-					pathway_i <- pathway_i[-1,]
+					em_i <- grep(paste(emGroupList[[i]], collapse="|"), pathways[,"pathway"])
 				}
+				pathway_i <- pathways[em_i, paste0("leadingEdge_", resNames[1])]
 			} else {
-				# Remove pathway name from matrix
-				pathway_i <- pathway_grab[-1,i]
+				# Leading edge genes for single pathway
+				pathway_i <- pathways[i, paste0("leadingEdge_", resNames[1])]
 			}
 
-			# Split original matrix into 3 columns (gene, snp, fst value)
-			pathway_i <- as.data.frame(str_split_fixed(pathway_i, ",", 3))
-
-			# Get unique SNPs/genes in pathway_i
-			pathway_i[pathway_i == ""] <- NA
-			pathway_i <- na.omit(pathway_i)
+			# Dataframe format
+			pathway_i <- data.frame(gene=unlist(strsplit(pathway_i, " ")))
 			pathway_i <- unique(pathway_i)
+
+			# Join with snp/gene/fst info and get unique entries
+			pathway_i <- left_join(pathway_i, snpFst, by="gene")
+			pathway_i$pathway <- pathwayNames[i]
+
+			# Store data in list
+			statList[[i]] <- pathway_i
 
 			# Replace spaces with underscore in pathway pathway_name_i string
 			# And replace special characters with underscore for PLINK compatibility
-			pathway_name_i <- gsub(" ", "_", pathway_name[i], fixed=TRUE)
+			pathway_name_i <- gsub(" ", "_", pathwayNames[i], fixed=TRUE)
 			pathway_name_i <- gsub('([[:punct:]])|\\s+', '_', pathway_name_i)
 
 			# Write out separate lists for pathway SNPs/genes
-			snp_list <- as.data.frame(pathway_i[,2])
-			gene_list <- as.data.frame(pathway_i[,1])
+			snpList <- as.data.frame(pathway_i[,"snp"])
+			geneList <- as.data.frame(pathway_i[,"gene"])
 
 			# Writing out SNP list
-			snp_file <- file.path(sprintf("%s/%s.snps", path_folder, pathway_name_i))
+			snpFile <- file.path(sprintf("%s/%s.snps", pathFolder, pathway_name_i))
 			cat(sprintf("\n* Generating list for SNPs in %s pathway...", pathway_name_i))
-			write.table(snp_list, file=snp_file, col=FALSE, row=FALSE, quote=FALSE)
+			write.table(snpList, file=snpFile, col=FALSE, row=FALSE, quote=FALSE)
 			cat(" done.\n")
 
 			# Writing out gene list
-			gene_file <- file.path(sprintf("%s/%s.genes", path_folder, pathway_name_i))
+			geneFile <- file.path(sprintf("%s/%s.genes", pathFolder, pathway_name_i))
 			cat(sprintf("* Generating list for genes in %s pathway...", pathway_name_i))
-			write.table(gene_list, file=gene_file, col=FALSE, row=FALSE, quote=FALSE)
+			write.table(geneList, file=geneFile, col=FALSE, row=FALSE, quote=FALSE)
 			cat(" done.\n")
 
 			# Subsetting PLINK files for pathway SNPs (for use in SNPassoc*.R)
-			out_file <- gsub("\\..*", "", snp_file)
-			str1 <- sprintf("PLINK --bed %s.bed --bim %s.bim --fam %s --extract %s",
-											genotype_file, genotype_file, fam_file, snp_file)
-			str2 <- sprintf("--make-bed --allow-no-sex --out %s", out_file)
+			outFile <- gsub("\\..*", "", snpFile)
+			str1 <- sprintf("PLINK --bed %s.bed --bim %s.bim --fam %s --extract %s", genotypeFile, genotypeFile, famFile, snpFile)
+			str2 <- sprintf("--make-bed --allow-no-sex --out %s", outFile)
 			cmd <- sprintf("%s %s", str1, str2)
 			system(cmd)
 		}
 
-		# Concatenate SNP/gene files into master file
-		concatFiles <- function(x) {
-			cat(sprintf("* Combining all %s into master file...", x))
+		# Write out table of all pathway stats
+		statList <- bind_rows(statList)
+		write.table(statList, file=statOut, col=TRUE, quote=FALSE, sep="\t")
 
+		# Concatenate SNP/gene files into master file
+		#concatFiles <- function(x) {
 			# Define name for concatenated file
-			out_file <- sprintf("%s/%s_%s", output_folder, x, pathway_set)
+		#	cat(sprintf("* Combining all %s into master file...", x))
+		#	outFile <- sprintf("%s/%s_%s", outputFolder, x, pathwaySet)
 
 			# Grab all x files in pathway set, either SNPs or genes
-			cmd <- sprintf("cat %s/*.%s > %s.txt", path_folder, x, out_file)
-			cat(sprintf(" writing out to %s.txt\n", out_file))
-			system(cmd)
+		#	cmd <- sprintf("cat %s/*.%s > %s.txt", pathFolder, x, outFile)
+		#	cat(sprintf(" writing out to %s.txt\n", outFile))
+		#	system(cmd)
 
 			# Read in file and filter for unique SNPs or genes
-			cat(sprintf("* Subsetting for unique %s...", x))
-			master <- read.table(sprintf("%s.txt", out_file), h=FALSE, as.is=TRUE)
-			master_unique <- as.data.frame(unique(master))
-			cat(sprintf(" writing out to %s_unique.txt.\n", out_file))
-			write.table(master_unique, file=sprintf("%s_unique.txt", out_file), col=FALSE, row=FALSE, quote=FALSE)
-		}
-		# Apply to generate both SNP and gene list
-		invisible(mapply(concatFiles, c("snps", "genes")))
+		#	cat(sprintf("* Subsetting for unique %s...", x))
+		#	master <- read.table(sprintf("%s.txt", outFile), h=FALSE, as.is=TRUE)
+		#	masterUnique <- as.data.frame(unique(master))
+		#	cat(sprintf(" writing out to %s_unique.txt.\n", outFile))
+		#	write.table(masterUnique, file=sprintf("%s_unique.txt", outFile), col=FALSE, row=FALSE, quote=FALSE)
+		#}
+
+		# Apply to generate master SNP and gene lists
+		#invisible(mapply(concatFiles, c("snps", "genes")))
 	}
 
- # Run function for enriched and unenriched pathways
- set_list <- c("enriched", "enrichedEM", "unenriched")
- nes_list <- c(ENRICH_NES, ENRICH_NES, UNENRICH_NES)
- dir_list <- c(enrich_folder, enrichEM_folder, unenrich_folder)
- invisible(mapply(pathInfo, set_list, nes_list, dir_list))
+	 # Run function for enriched and unenriched pathways
+	 setList <- c("enriched", "enrichedEM", "unenriched")
+	 nesList <- c(enrichFDR, enrichFDR, unenrichNES)
+	 dirList <- c(enrichFolder, enrichEMFolder, unenrichFolder)
+	 invisible(mapply(pathInfo, setList, nesList, dirList))
 }
